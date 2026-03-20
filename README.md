@@ -46,12 +46,15 @@
 ### Engineering
 
 - [TECH_PLAN.md](docs/engineering/TECH_PLAN.md)
+- [TECH_DECISION.md](docs/engineering/TECH_DECISION.md)
 - [DATA_MODEL.md](docs/engineering/DATA_MODEL.md)
 - [DB_SCHEMA_PLAN.md](docs/engineering/DB_SCHEMA_PLAN.md)
 - [BACKEND_API_PLAN.md](docs/engineering/BACKEND_API_PLAN.md)
 - [AUTH_FLOW.md](docs/engineering/AUTH_FLOW.md)
 - [FRONTEND_APP_STRUCTURE.md](docs/engineering/FRONTEND_APP_STRUCTURE.md)
 - [IMPLEMENTATION_PHASES.md](docs/engineering/IMPLEMENTATION_PHASES.md)
+- [TEST_STRATEGY.md](docs/engineering/TEST_STRATEGY.md)
+- [DEVOPS_CICD_PLAN.md](docs/engineering/DEVOPS_CICD_PLAN.md)
 
 ### TIL
 
@@ -74,9 +77,10 @@
 1. Nuxt 3 프로젝트 초기화
 2. NestJS 프로젝트 초기화
 3. PostgreSQL / Redis 로컬 개발 환경 연결
-4. 인증 기초 구현
-5. 기록 작성 / 자동 저장 / 아카이브 구현
-6. 초안 생성 / 정렬 / 미리보기 구현
-7. 랜딩 페이지 실제 구현
+4. 테스트 전략과 CI 기본 골격 반영
+5. 인증 기초 구현
+6. 기록 작성 / 자동 저장 / 아카이브 구현
+7. 초안 생성 / 정렬 / 미리보기 구현
+8. 랜딩 페이지 실제 구현
 
 세부 순서는 [IMPLEMENTATION_PHASES.md](docs/engineering/IMPLEMENTATION_PHASES.md)를 따른다.
