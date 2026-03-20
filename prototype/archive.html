@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Book Maker Archive</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">Book Maker</div>
+        <nav class="nav">
+          <a href="./archive.html" class="active">Archive</a>
+          <a href="./draft-builder.html">Drafts</a>
+          <a href="./write.html">Write</a>
+        </nav>
+        <a class="cta" href="./write.html">New Entry</a>
+      </div>
+    </header>
+
+    <main class="app-shell">
+      <aside class="sidebar">
+        <div class="title">Your Archive</div>
+        <div class="hint">Private Writing Home</div>
+        <nav>
+          <a href="./write.html">Write</a>
+          <a href="./archive.html" class="active">Archive</a>
+          <a href="./draft-builder.html">Drafts</a>
+          <a href="./draft-preview.html">Preview</a>
+        </nav>
+        <a class="ghost" href="./index.html" style="display:inline-block;">Back to Landing</a>
+      </aside>
+
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <h1 class="panel-title">Your Archive</h1>
+            <p class="panel-subtitle">
+              A private collection of scenes, thoughts, and unfinished beginnings.
+            </p>
+          </div>
+          <input class="search" value="Search your writing" readonly />
+        </div>
+
+        <div class="archive-list">
+          <article class="archive-item">
+            <div class="archive-meta">Oct 24, 2023</div>
+            <h3>The Morning Fog over the Pier</h3>
+            <p>
+              The salt air stayed on the window long after I had left. Some mornings
+              feel less like weather and more like memory returning.
+            </p>
+          </article>
+
+          <article class="archive-item">
+            <div class="archive-meta">Sep 12, 2023</div>
+            <h3>Fragment on Silence</h3>
+            <p>
+              Not every silence is empty. Some are waiting rooms for truth, and
+              some are the shape of a person who has not yet answered.
+            </p>
+          </article>
+
+          <article class="archive-item">
+            <div class="archive-meta">Aug 05, 2023</div>
+            <h3>Notes from the Blue Cafe</h3>
+            <p>
+              A woman in a red coat wrote postcards by the window. Her reflection
+              kept arriving half a second late in the glass.
+            </p>
+          </article>
+
+          <article class="archive-item">
+            <div class="archive-meta">Jun 14, 2023</div>
+            <h3>A line I wanted to keep</h3>
+            <p>
+              The only way out of a maze, perhaps, is not speed but attention.
+            </p>
+          </article>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

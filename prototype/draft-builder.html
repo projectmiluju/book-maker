@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Book Maker Draft Builder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">Book Maker</div>
+        <nav class="nav">
+          <a href="./archive.html">Archive</a>
+          <a href="./draft-builder.html" class="active">Drafts</a>
+          <a href="./write.html">Write</a>
+        </nav>
+        <a class="soft" href="./draft-preview.html">Preview Draft</a>
+      </div>
+    </header>
+
+    <main class="app-shell">
+      <aside class="sidebar">
+        <div class="title">Drafts</div>
+        <div class="hint">From Archive to Manuscript</div>
+        <nav>
+          <a href="./write.html">Write</a>
+          <a href="./archive.html">Archive</a>
+          <a href="./draft-builder.html" class="active">Drafts</a>
+          <a href="./draft-preview.html">Preview</a>
+        </nav>
+        <button class="cta">Add Entry</button>
+      </aside>
+
+      <section class="panel">
+        <div class="mini-meta">Draft Builder</div>
+        <input class="panel-title" value="The Whispering Pines" />
+        <textarea class="panel-subtitle" rows="2">A collection of notes centered on memory, weather, and the slow return of places once left behind.</textarea>
+
+        <div class="draft-meta-grid">
+          <div>
+            <div class="mini-meta">Word Count</div>
+            <div>12,402 words</div>
+          </div>
+          <div>
+            <div class="mini-meta">Entries</div>
+            <div>8 selected</div>
+          </div>
+          <div>
+            <div class="mini-meta">Status</div>
+            <div>Active draft</div>
+          </div>
+        </div>
+
+        <div class="panel-header" style="margin-top: 28px;">
+          <div>
+            <div class="eyebrow">Manuscript Sequence</div>
+          </div>
+          <button class="ghost">Choose From Archive</button>
+        </div>
+
+        <div class="sequence">
+          <article class="sequence-item">
+            <div class="sequence-index">01</div>
+            <div>
+              <h4>The Morning Fog</h4>
+              <p>The shoreline held itself like a secret too patient to disappear.</p>
+            </div>
+            <div class="sequence-tag">July 2023</div>
+          </article>
+
+          <article class="sequence-item">
+            <div class="sequence-index">02</div>
+            <div>
+              <h4>Echoes in the Attic</h4>
+              <p>Old floorboards remember weight more honestly than people do.</p>
+            </div>
+            <div class="sequence-tag">August 2023</div>
+          </article>
+
+          <article class="sequence-item">
+            <div class="sequence-index">03</div>
+            <div>
+              <h4>The Salt Merchant's Daughter</h4>
+              <p>Trade was never just exchange. It was breath, weather, and rumor.</p>
+            </div>
+            <div class="sequence-tag">September 2023</div>
+          </article>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
