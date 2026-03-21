@@ -14,6 +14,36 @@
 
 ### 완료
 
+- 이슈 `#7` 기준 코드 컨벤션 baseline 정리
+- 루트 `.editorconfig`, `.prettierrc.json`, `.prettierignore` 추가
+- `apps/web`, `apps/api` ESLint 기준 정리 및 import 자동 정렬 규칙 추가
+- 루트 `lint`, `lint:fix`, `typecheck`, `format`, `format:check` 스크립트 추가
+- CI에 `lint`, `typecheck` 단계 추가
+- `docs/engineering/CODE_CONVENTION.md` 추가
+
+### 현재 상태
+
+- 프론트엔드와 백엔드에 공통 코드 스타일 baseline이 생김
+- 로컬과 CI에서 같은 품질 명령을 사용할 수 있음
+- import 정렬과 포맷팅 자동 수정 흐름이 정리됨
+
+### 다음 액션
+
+1. PostgreSQL / Redis 실제 기동 확인
+2. NestJS Config / Validation / Env 로딩 구조 추가
+3. 인증 기초 구현 준비
+
+### 메모
+
+- 포맷팅은 Prettier, 린트는 ESLint로 역할 분리
+- CI 기본 품질 게이트는 `lint + typecheck + build + test` 기준으로 유지
+
+---
+
+## 2026-03-21
+
+### 완료
+
 - Git 저장소 초기화 및 기본 브랜치 `main`으로 변경
 - `.gitignore` 추가
 - 루트 문서를 `docs/product`, `docs/design`, `docs/engineering`, `docs/til` 구조로 정리

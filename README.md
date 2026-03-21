@@ -54,6 +54,7 @@
 - [AUTH_FLOW.md](docs/engineering/AUTH_FLOW.md)
 - [FRONTEND_APP_STRUCTURE.md](docs/engineering/FRONTEND_APP_STRUCTURE.md)
 - [IMPLEMENTATION_PHASES.md](docs/engineering/IMPLEMENTATION_PHASES.md)
+- [CODE_CONVENTION.md](docs/engineering/CODE_CONVENTION.md)
 - [COMMIT_CONVENTION.md](docs/engineering/COMMIT_CONVENTION.md)
 - [SUBAGENT_GUIDELINES.md](docs/engineering/SUBAGENT_GUIDELINES.md)
 - [TEST_STRATEGY.md](docs/engineering/TEST_STRATEGY.md)
@@ -87,3 +88,11 @@
 8. 랜딩 페이지 실제 구현
 
 세부 순서는 [IMPLEMENTATION_PHASES.md](docs/engineering/IMPLEMENTATION_PHASES.md)를 따른다.
+
+## 품질 명령
+
+- `pnpm lint`
+- `pnpm lint:fix`
+- `pnpm typecheck`
+- `pnpm format`
+- `pnpm format:check`
