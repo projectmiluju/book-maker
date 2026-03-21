@@ -171,6 +171,7 @@ MVP는 아래 4가지만 증명하면 된다.
 - `docs/engineering/FRONTEND_APP_STRUCTURE.md`
 - `docs/engineering/IMPLEMENTATION_PHASES.md`
 - `docs/engineering/COMMIT_CONVENTION.md`
+- `docs/engineering/SUBAGENT_GUIDELINES.md`
 - `docs/engineering/TEST_STRATEGY.md`
 - `docs/engineering/DEVOPS_CICD_PLAN.md`
 
@@ -185,6 +186,10 @@ MVP는 아래 4가지만 증명하면 된다.
 - 핵심 기능은 테스트 가능하게 설계한다
 - CI에 올릴 수 없는 작업 흐름을 당연한 전제로 두지 않는다
 - 리스크가 큰 도메인 로직은 가능하면 테스트를 먼저 작성하고 구현한다
+- 병렬화 이득이 있으면 메인 에이전트가 자율적으로 서브에이전트를 사용할 수 있다
+- 서브에이전트를 사용할 때는 먼저 범위와 write scope를 분리한다
+- 서브에이전트를 사용할 때는 중간 진행 메시지에서 병렬 작업 여부와 역할 분리를 사용자에게 알린다
+- 서브에이전트 결과는 메인 에이전트가 검토하고 통합한다
 
 ### 하지 말아야 할 것
 
@@ -195,6 +200,8 @@ MVP는 아래 4가지만 증명하면 된다.
 - 테스트를 나중으로 무기한 미루지 않는다
 - 품질 게이트 없이 main 기준 작업을 계속 쌓지 않는다
 - 모든 작업에 기계적으로 TDD를 강제하지 않는다
+- 서브에이전트끼리 자연스럽게 알아서 정렬될 것이라고 가정하지 않는다
+- 같은 파일을 여러 서브에이전트에게 동시에 맡기지 않는다
 
 ## 11. 매 세션 시작 시 해야 할 일
 
