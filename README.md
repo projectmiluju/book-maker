@@ -54,6 +54,7 @@
 - [AUTH_FLOW.md](docs/engineering/AUTH_FLOW.md)
 - [FRONTEND_APP_STRUCTURE.md](docs/engineering/FRONTEND_APP_STRUCTURE.md)
 - [IMPLEMENTATION_PHASES.md](docs/engineering/IMPLEMENTATION_PHASES.md)
+- [COMMIT_CONVENTION.md](docs/engineering/COMMIT_CONVENTION.md)
 - [TEST_STRATEGY.md](docs/engineering/TEST_STRATEGY.md)
 - [DEVOPS_CICD_PLAN.md](docs/engineering/DEVOPS_CICD_PLAN.md)
 
