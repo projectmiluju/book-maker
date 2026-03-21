@@ -1,0 +1,10 @@
+{
+  "name": "book-maker",
+  "private": true,
+  "packageManager": "pnpm@10.30.3",
+  "scripts": {
+    "dev:web": "pnpm --filter @book-maker/web dev",
+    "build:web": "pnpm --filter @book-maker/web build",
+    "preview:web": "pnpm --filter @book-maker/web preview"
+  }
+}
