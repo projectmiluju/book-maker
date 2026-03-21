@@ -1,8 +1,8 @@
 ---
 name: 문서 작업
 about: 기획, 설계, 가이드 문서 작성 또는 수정 작업입니다.
-title: "[DOCS] "
-labels: ["documentation"]
+title: '[DOCS] '
+labels: ['documentation']
 assignees: []
 ---
 
@@ -12,11 +12,11 @@ assignees: []
 
 ## 대상 문서
 
-- 
+-
 
 ## 반영 내용
 
-- 
+-
 
 ## 완료 조건
 
@@ -25,4 +25,4 @@ assignees: []
 
 ## 비고
 
-- 
+-

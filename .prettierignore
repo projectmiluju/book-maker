@@ -1,0 +1,9 @@
+.nuxt
+.output
+dist
+coverage
+node_modules
+apps/web/.nuxt
+apps/web/.output
+apps/api/dist
+pnpm-lock.yaml

@@ -6,12 +6,19 @@
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
+    "lint": "eslint . --ext .js,.ts,.vue --max-warnings=0",
+    "lint:fix": "eslint . --ext .js,.ts,.vue --fix",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "typecheck": "nuxt typecheck"
   },
   "dependencies": {
     "nuxt": "^4.4.2",
     "vue": "^3.5.30",
     "vue-router": "^5.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.15",
+    "vue-tsc": "^3.2.6"
   }
 }

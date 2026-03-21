@@ -27,7 +27,7 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: "Newsreader", Georgia, serif;
+  font-family: 'Newsreader', Georgia, serif;
   line-height: 1.5;
 }
 
@@ -83,7 +83,7 @@ textarea {
 }
 
 .brand {
-  font-family: "Noto Serif", Georgia, serif;
+  font-family: 'Noto Serif', Georgia, serif;
   font-style: italic;
   font-size: 24px;
 }
@@ -93,7 +93,7 @@ textarea {
   align-items: center;
   gap: 28px;
   color: var(--text-muted);
-  font-family: "Manrope", sans-serif;
+  font-family: 'Manrope', sans-serif;
   font-size: 13px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -109,7 +109,7 @@ textarea {
   border-radius: 999px;
   padding: 12px 18px;
   border: 1px solid transparent;
-  font-family: "Manrope", sans-serif;
+  font-family: 'Manrope', sans-serif;
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.14em;
@@ -136,7 +136,7 @@ textarea {
 }
 
 .eyebrow {
-  font-family: "Manrope", sans-serif;
+  font-family: 'Manrope', sans-serif;
   font-size: 11px;
   letter-spacing: 0.24em;
   text-transform: uppercase;
@@ -151,7 +151,7 @@ textarea {
 }
 
 .display {
-  font-family: "Noto Serif", Georgia, serif;
+  font-family: 'Noto Serif', Georgia, serif;
   font-size: clamp(48px, 6vw, 88px);
   line-height: 0.98;
   letter-spacing: -0.04em;
@@ -185,7 +185,7 @@ textarea {
 }
 
 .paper-preview .chapter {
-  font-family: "Manrope", sans-serif;
+  font-family: 'Manrope', sans-serif;
   font-size: 11px;
   letter-spacing: 0.28em;
   text-transform: uppercase;
@@ -193,7 +193,7 @@ textarea {
 }
 
 .paper-preview h3 {
-  font-family: "Noto Serif", Georgia, serif;
+  font-family: 'Noto Serif', Georgia, serif;
   font-size: 38px;
   margin: 20px 0 22px;
 }
@@ -214,7 +214,7 @@ textarea {
 }
 
 .section-title {
-  font-family: "Noto Serif", Georgia, serif;
+  font-family: 'Noto Serif', Georgia, serif;
   font-size: clamp(32px, 3.4vw, 54px);
   line-height: 1.06;
   margin: 8px 0 20px;
@@ -242,7 +242,7 @@ textarea {
 .card h3,
 .card h4 {
   margin: 0 0 10px;
-  font-family: "Noto Serif", Georgia, serif;
+  font-family: 'Noto Serif', Georgia, serif;
 }
 
 .card p {
@@ -271,13 +271,13 @@ textarea {
 }
 
 .sidebar .title {
-  font-family: "Noto Serif", Georgia, serif;
+  font-family: 'Noto Serif', Georgia, serif;
   font-size: 24px;
   margin-bottom: 4px;
 }
 
 .sidebar .hint {
-  font-family: "Manrope", sans-serif;
+  font-family: 'Manrope', sans-serif;
   color: var(--text-faint);
   font-size: 11px;
   letter-spacing: 0.18em;
@@ -294,7 +294,7 @@ textarea {
   padding: 12px 14px;
   border-radius: 14px;
   color: var(--text-muted);
-  font-family: "Manrope", sans-serif;
+  font-family: 'Manrope', sans-serif;
   font-size: 13px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -321,7 +321,7 @@ textarea {
 }
 
 .panel-title {
-  font-family: "Noto Serif", Georgia, serif;
+  font-family: 'Noto Serif', Georgia, serif;
   font-size: clamp(32px, 3vw, 48px);
   margin: 0;
 }
@@ -359,7 +359,7 @@ textarea {
 
 .archive-meta,
 .mini-meta {
-  font-family: "Manrope", sans-serif;
+  font-family: 'Manrope', sans-serif;
   color: var(--text-faint);
   font-size: 11px;
   letter-spacing: 0.16em;
@@ -368,7 +368,7 @@ textarea {
 
 .archive-item h3,
 .draft-item h3 {
-  font-family: "Noto Serif", Georgia, serif;
+  font-family: 'Noto Serif', Georgia, serif;
   font-size: 32px;
   margin: 10px 0 8px;
 }
@@ -387,7 +387,7 @@ textarea {
 }
 
 .editor-title {
-  font-family: "Noto Serif", Georgia, serif;
+  font-family: 'Noto Serif', Georgia, serif;
   font-size: clamp(34px, 4vw, 56px);
   margin-bottom: 18px;
 }
@@ -406,7 +406,7 @@ textarea {
   padding-top: 20px;
   border-top: 1px solid var(--line);
   color: var(--text-faint);
-  font-family: "Manrope", sans-serif;
+  font-family: 'Manrope', sans-serif;
   font-size: 11px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -440,14 +440,14 @@ textarea {
 }
 
 .sequence-index {
-  font-family: "Manrope", sans-serif;
+  font-family: 'Manrope', sans-serif;
   color: var(--text-faint);
   font-size: 12px;
   letter-spacing: 0.16em;
 }
 
 .sequence-item h4 {
-  font-family: "Noto Serif", Georgia, serif;
+  font-family: 'Noto Serif', Georgia, serif;
   font-size: 24px;
   margin: 0 0 6px;
 }
@@ -459,7 +459,7 @@ textarea {
 }
 
 .sequence-tag {
-  font-family: "Manrope", sans-serif;
+  font-family: 'Manrope', sans-serif;
   color: var(--text-faint);
   font-size: 11px;
   letter-spacing: 0.16em;
@@ -478,7 +478,7 @@ textarea {
 }
 
 .preview-title {
-  font-family: "Noto Serif", Georgia, serif;
+  font-family: 'Noto Serif', Georgia, serif;
   font-size: clamp(42px, 5vw, 78px);
   line-height: 1;
   letter-spacing: -0.04em;
@@ -503,7 +503,7 @@ textarea {
 }
 
 .manuscript h3 {
-  font-family: "Manrope", sans-serif;
+  font-family: 'Manrope', sans-serif;
   color: var(--text-faint);
   font-size: 11px;
   letter-spacing: 0.24em;
@@ -515,7 +515,7 @@ textarea {
   display: inline-flex;
   margin-bottom: 18px;
   color: var(--text-muted);
-  font-family: "Manrope", sans-serif;
+  font-family: 'Manrope', sans-serif;
   font-size: 12px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -525,7 +525,7 @@ textarea {
   padding: 48px 0 64px;
   text-align: center;
   color: var(--text-faint);
-  font-family: "Manrope", sans-serif;
+  font-family: 'Manrope', sans-serif;
   font-size: 11px;
   letter-spacing: 0.22em;
   text-transform: uppercase;

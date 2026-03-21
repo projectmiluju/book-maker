@@ -8,11 +8,12 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-book_maker}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-book_maker}
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - '${POSTGRES_PORT:-5432}:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-book_maker} -d ${POSTGRES_DB:-book_maker}"]
+      test:
+        ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-book_maker} -d ${POSTGRES_DB:-book_maker}']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -22,11 +23,11 @@ services:
     container_name: book-maker-redis
     restart: unless-stopped
     ports:
-      - "${REDIS_PORT:-6379}:6379"
+      - '${REDIS_PORT:-6379}:6379'
     volumes:
       - redis_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ['CMD', 'redis-cli', 'ping']
       interval: 10s
       timeout: 5s
       retries: 5

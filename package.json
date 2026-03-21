@@ -6,8 +6,30 @@
     "dev:web": "pnpm --filter @book-maker/web dev",
     "build:web": "pnpm --filter @book-maker/web build",
     "preview:web": "pnpm --filter @book-maker/web preview",
+    "lint:web": "pnpm --filter @book-maker/web lint",
+    "lint:fix:web": "pnpm --filter @book-maker/web lint:fix",
+    "typecheck:web": "pnpm --filter @book-maker/web typecheck",
     "dev:api": "pnpm --filter @book-maker/api start:dev",
     "build:api": "pnpm --filter @book-maker/api build",
-    "test:api:e2e": "pnpm --filter @book-maker/api test:e2e"
+    "lint:api": "pnpm --filter @book-maker/api lint",
+    "lint:fix:api": "pnpm --filter @book-maker/api lint:fix",
+    "typecheck:api": "pnpm --filter @book-maker/api typecheck",
+    "test:api:e2e": "pnpm --filter @book-maker/api test:e2e",
+    "lint": "pnpm lint:web && pnpm lint:api",
+    "lint:fix": "pnpm lint:fix:web && pnpm lint:fix:api",
+    "typecheck": "pnpm typecheck:web && pnpm typecheck:api",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.4",
+    "eslint": "^9.39.4",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "eslint-plugin-vue": "^10.8.0",
+    "globals": "^16.5.0",
+    "prettier": "^3.8.1",
+    "typescript-eslint": "^8.57.1",
+    "vue-eslint-parser": "^10.4.0"
   }
 }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'app' })
+definePageMeta({ layout: 'app' });
 </script>
 
 <template>
@@ -31,17 +31,9 @@ definePageMeta({ layout: 'app' })
           <span class="dot-status">자동 저장 중</span>
         </div>
 
-        <input
-          class="writer-title"
-          placeholder="제목 (선택)"
-          spellcheck="false"
-        />
+        <input class="writer-title" placeholder="제목 (선택)" spellcheck="false" />
 
-        <textarea
-          class="writer-body"
-          placeholder="오늘의 장면이나 생각을 남겨 보세요."
-          rows="14"
-        />
+        <textarea class="writer-body" placeholder="오늘의 장면이나 생각을 남겨 보세요." rows="14" />
 
         <div class="writer-footer">
           <span class="writer-meta">0자</span>
