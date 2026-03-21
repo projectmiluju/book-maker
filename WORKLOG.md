@@ -74,3 +74,59 @@
 
 - 프롬프트 문서도 이제 한국어 제품 기준으로 맞춤
 - 전문 출판 용어보다 MVP 용어를 우선 사용
+
+---
+
+## 2026-03-21 (NestJS 부트스트랩)
+
+### 완료
+
+- 이슈 `#5` 생성
+- `feat/nest-bootstrap` 브랜치 생성
+- `apps/api` NestJS 앱 초기화
+- 루트 `.env.example` 추가
+- 루트 `docker-compose.yml` 추가
+- `/api/health` 엔드포인트와 health 모듈 추가
+- 루트에서 `build:api`, `test:api:e2e` 실행 가능하도록 스크립트 추가
+- GitHub Actions CI 기본 워크플로 추가
+
+### 현재 상태
+
+- 웹과 API가 모두 워크스페이스에 포함됨
+- PostgreSQL / Redis 로컬 실행 파일이 준비됨
+- API는 `/api/health` 기준으로 빌드와 e2e 테스트까지 확인됨
+
+### 다음 액션
+
+1. Docker Compose 실제 기동 확인
+2. NestJS에 Config / Validation / Env 로딩 구조 추가
+3. Auth 모듈과 사용자 기본 엔티티 방향 잡기
+
+### 메모
+
+- API e2e 테스트는 로컬 샌드박스에서는 포트 바인딩 제한이 있어 권한 상승 후 검증함
+
+---
+
+## 2026-03-21 (커밋 컨벤션 정리)
+
+### 완료
+
+- `docs/engineering/COMMIT_CONVENTION.md` 추가
+- 커밋 타입, 메시지 형식, 커밋 분리 기준 정리
+- README와 AGENTS에 커밋 컨벤션 문서 연결
+
+### 현재 상태
+
+- 커밋 메시지와 커밋 분리 기준이 공식 문서로 고정됨
+- 이후 커밋 보조 스킬이 참조할 기준이 생김
+
+### 다음 액션
+
+1. 현재 변경 파일을 논리적 단위로 묶는 커밋 스킬 설계
+2. 커밋 스킬이 `COMMIT_CONVENTION.md`를 기준으로 동작하게 정의
+
+### 메모
+
+- 메시지 형식은 `type: 한글 요약`으로 유지
+- 기본 타입은 `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `ci`

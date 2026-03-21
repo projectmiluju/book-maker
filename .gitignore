@@ -32,6 +32,9 @@ temp/
 # IDE / editors
 .idea/
 .vscode/
+.codex/
+.gemini/
+.claude/
 
 # OS / misc
 Thumbs.db

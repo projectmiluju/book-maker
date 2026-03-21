@@ -170,6 +170,7 @@ MVP는 아래 4가지만 증명하면 된다.
 - `docs/engineering/DB_SCHEMA_PLAN.md`
 - `docs/engineering/FRONTEND_APP_STRUCTURE.md`
 - `docs/engineering/IMPLEMENTATION_PHASES.md`
+- `docs/engineering/COMMIT_CONVENTION.md`
 - `docs/engineering/TEST_STRATEGY.md`
 - `docs/engineering/DEVOPS_CICD_PLAN.md`
 

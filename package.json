@@ -5,6 +5,9 @@
   "scripts": {
     "dev:web": "pnpm --filter @book-maker/web dev",
     "build:web": "pnpm --filter @book-maker/web build",
-    "preview:web": "pnpm --filter @book-maker/web preview"
+    "preview:web": "pnpm --filter @book-maker/web preview",
+    "dev:api": "pnpm --filter @book-maker/api start:dev",
+    "build:api": "pnpm --filter @book-maker/api build",
+    "test:api:e2e": "pnpm --filter @book-maker/api test:e2e"
   }
 }
