@@ -1,8 +1,8 @@
 ---
 name: 공통 작업
 about: 환경 구성, 부트스트랩, 설정 정리 등 기능/버그/문서 외 공통 작업을 정의합니다.
-title: "[CHORE] "
-labels: ["chore"]
+title: '[CHORE] '
+labels: ['chore']
 assignees: []
 ---
 
@@ -12,11 +12,11 @@ assignees: []
 
 ## 목표
 
-- 
+-
 
 ## 작업 범위
 
-- 
+-
 
 ## 구현 메모
 
@@ -31,4 +31,4 @@ assignees: []
 
 ## 비고
 
-- 
+-

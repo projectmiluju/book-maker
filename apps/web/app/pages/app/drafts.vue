@@ -1,26 +1,26 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'app' })
+definePageMeta({ layout: 'app' });
 
 const draftEntries = [
   {
     order: '01',
     title: '창가에 남은 빛',
     body: '저녁빛이 식탁 위를 천천히 지나가던 순간.',
-    tag: '03.18'
+    tag: '03.18',
   },
   {
     order: '02',
     title: '대답 없는 전화',
     body: '받지 못한 순간이 오히려 더 오래 남는다.',
-    tag: '03.12'
+    tag: '03.12',
   },
   {
     order: '03',
     title: '메모해 두고 싶었던 문장',
     body: '큰 사건보다 작은 반복 속에서 사람이 바뀐다.',
-    tag: '03.01'
-  }
-]
+    tag: '03.01',
+  },
+];
 </script>
 
 <template>
@@ -49,7 +49,9 @@ const draftEntries = [
     <section class="app-main">
       <div class="draft-hero">
         <input class="draft-title-input" value="고요가 머무는 자리" />
-        <textarea class="draft-description" rows="2">흩어진 기록을 조용한 흐름으로 묶어 두는 초안.</textarea>
+        <textarea class="draft-description" rows="2">
+흩어진 기록을 조용한 흐름으로 묶어 두는 초안.</textarea
+        >
 
         <div class="draft-meta">
           <span>기록 {{ draftEntries.length }}개</span>
@@ -66,11 +68,7 @@ const draftEntries = [
       <div class="sequence-header">순서</div>
 
       <div class="sequence-list">
-        <article
-          v-for="entry in draftEntries"
-          :key="entry.order"
-          class="sequence-item"
-        >
+        <article v-for="entry in draftEntries" :key="entry.order" class="sequence-item">
           <div class="sequence-order">{{ entry.order }}</div>
           <div>
             <h2 class="sequence-title">{{ entry.title }}</h2>

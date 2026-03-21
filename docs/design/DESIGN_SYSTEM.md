@@ -25,6 +25,7 @@
 ## 3. 참고한 Stitch 방향
 
 가져갈 것:
+
 - 페이퍼 시트 중심 작성 화면
 - 좌측 고정 사이드바 + 상단바의 이중 구조
 - 톤 기반 표면 분리 (sidebar: surface-low / main: surface)
@@ -34,6 +35,7 @@
 - 랜딩 히어로의 종이 시트 미리보기
 
 버릴 것:
+
 - 3패널 작성 레이아웃 (writer-side 우측 패널)
 - 벤토형 아카이브 카드 계층
 - 과한 장식용 배너/이미지 블록
@@ -67,43 +69,45 @@
 
 ## 5. 색상 시스템
 
-| 토큰 | 값 | 용도 |
-|---|---|---|
-| `--bg` | `#f7f4ef` | 전체 앱 기본 배경 |
-| `--surface` | `#fffdfa` | 패널, 카드, 페이퍼 시트 |
-| `--surface-low` | `#f2eee7` | sidebar, 구분 영역 |
-| `--surface-mid` | `#ebe6de` | 버튼 secondary, 구분 배경 |
-| `--text` | `#232425` | 주 본문 텍스트 |
-| `--text-muted` | `#666760` | 보조 설명 |
-| `--text-faint` | `#8a8a82` | 메타데이터, eyebrow, 상태 |
-| `--line` | `rgba(35,36,37,0.08)` | 기본 구분선 |
+| 토큰            | 값                    | 용도                             |
+| --------------- | --------------------- | -------------------------------- |
+| `--bg`          | `#f7f4ef`             | 전체 앱 기본 배경                |
+| `--surface`     | `#fffdfa`             | 패널, 카드, 페이퍼 시트          |
+| `--surface-low` | `#f2eee7`             | sidebar, 구분 영역               |
+| `--surface-mid` | `#ebe6de`             | 버튼 secondary, 구분 배경        |
+| `--text`        | `#232425`             | 주 본문 텍스트                   |
+| `--text-muted`  | `#666760`             | 보조 설명                        |
+| `--text-faint`  | `#8a8a82`             | 메타데이터, eyebrow, 상태        |
+| `--line`        | `rgba(35,36,37,0.08)` | 기본 구분선                      |
 | `--line-strong` | `rgba(35,36,37,0.16)` | 강조 구분선, feature-item border |
-| `--accent` | `#1f2e45` | 링크 hover, 강조 |
+| `--accent`      | `#1f2e45`             | 링크 hover, 강조                 |
 
 원칙:
+
 - 색상은 구조 역할만 한다
 - 강렬한 accent 사용 금지
 - "No-line rule": 섹션 구분은 선보다 배경 톤 변화로
 
 ## 6. 타이포그래피 시스템
 
-| 역할 | 크기 | 특성 |
-|---|---|---|
-| Display (랜딩 히어로) | clamp(48px, 6vw, 88px) | weight 800, tracking -0.05em |
-| Page Title (앱 화면) | clamp(40px, 4vw, 64px) | weight 800, tracking -0.05em |
-| Draft/Preview Title | clamp(42px, 5vw, 70px) | weight 800, tracking -0.05em |
-| Writer Title | clamp(40px, 4vw, 64px) | weight 800, tracking -0.05em |
-| Section Title (랜딩) | clamp(32px, 4vw, 58px) | weight 800, tracking -0.04em |
-| Archive Item Title | 18px | weight 700, tracking -0.03em |
-| Sequence Title | 20px | weight 700, tracking -0.03em |
-| Body (lede, section-copy) | 18–19px | weight 400, leading 1.72–1.75 |
-| Writing Body | clamp(18px, 1.8vw, 22px) | weight 400, leading 1.95 |
-| Manuscript Reading | clamp(20px, 2.2vw, 26px) | weight 400, leading 1.9 |
-| Meta / Label / Eyebrow | 11–12px | uppercase, tracking 0.14–0.16em |
+| 역할                      | 크기                     | 특성                            |
+| ------------------------- | ------------------------ | ------------------------------- |
+| Display (랜딩 히어로)     | clamp(48px, 6vw, 88px)   | weight 800, tracking -0.05em    |
+| Page Title (앱 화면)      | clamp(40px, 4vw, 64px)   | weight 800, tracking -0.05em    |
+| Draft/Preview Title       | clamp(42px, 5vw, 70px)   | weight 800, tracking -0.05em    |
+| Writer Title              | clamp(40px, 4vw, 64px)   | weight 800, tracking -0.05em    |
+| Section Title (랜딩)      | clamp(32px, 4vw, 58px)   | weight 800, tracking -0.04em    |
+| Archive Item Title        | 18px                     | weight 700, tracking -0.03em    |
+| Sequence Title            | 20px                     | weight 700, tracking -0.03em    |
+| Body (lede, section-copy) | 18–19px                  | weight 400, leading 1.72–1.75   |
+| Writing Body              | clamp(18px, 1.8vw, 22px) | weight 400, leading 1.95        |
+| Manuscript Reading        | clamp(20px, 2.2vw, 26px) | weight 400, leading 1.9         |
+| Meta / Label / Eyebrow    | 11–12px                  | uppercase, tracking 0.14–0.16em |
 
 폰트 스택: `"Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif`
 
 원칙:
+
 - 한글 제품이므로 기본 폰트는 한국어 가독성이 좋은 sans-serif로 통일
 - 문학적 분위기는 세리프 폰트가 아니라 크기, 간격, 폭 제한으로 만든다
 - 페이지 제목은 강하게, 본문은 조용하게 유지한다
@@ -142,16 +146,16 @@
 
 ## 8. 간격 시스템
 
-| 토큰 | 값 | 주 용도 |
-|---|---|---|
-| `--space-3` | 12px | 버튼 gap, 소요소 간격 |
-| `--space-4` | 16px | 작은 내부 패딩 |
-| `--space-5` | 24px | 목록 아이템 패딩 |
-| `--space-6` | 32px | 섹션 내부 간격 |
-| `--space-7` | 40px | 컴포넌트 간 여백 |
-| `--space-8` | 56px | 주요 섹션 여백 |
-| `--space-9` | 72px | hero/preview 패딩 |
-| `--space-10` | 96px | 섹션 padding |
+| 토큰         | 값   | 주 용도               |
+| ------------ | ---- | --------------------- |
+| `--space-3`  | 12px | 버튼 gap, 소요소 간격 |
+| `--space-4`  | 16px | 작은 내부 패딩        |
+| `--space-5`  | 24px | 목록 아이템 패딩      |
+| `--space-6`  | 32px | 섹션 내부 간격        |
+| `--space-7`  | 40px | 컴포넌트 간 여백      |
+| `--space-8`  | 56px | 주요 섹션 여백        |
+| `--space-9`  | 72px | hero/preview 패딩     |
+| `--space-10` | 96px | 섹션 padding          |
 
 원칙: 구분선보다 공간으로 구획을 나눈다. 빡빡하면 spacing을 늘린다.
 

@@ -1,8 +1,8 @@
 ---
 name: 기능 작업
 about: 새로운 기능 또는 기능 개선 작업을 정의합니다.
-title: "[FEAT] "
-labels: ["feature"]
+title: '[FEAT] '
+labels: ['feature']
 assignees: []
 ---
 
@@ -12,11 +12,11 @@ assignees: []
 
 ## 목표
 
-- 
+-
 
 ## 작업 범위
 
-- 
+-
 
 ## 구현 메모
 
@@ -31,4 +31,4 @@ assignees: []
 
 ## 비고
 
-- 
+-
