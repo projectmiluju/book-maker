@@ -3,11 +3,11 @@
     <section class="hero">
       <div class="container hero-grid">
         <div>
-          <span class="eyebrow">Book Maker</span>
-          <h1 class="display">짧은 기록이<br>한 권이 됩니다.</h1>
+          <span class="eyebrow">안녕, 나의 바다</span>
+          <h1 class="display">모든 안녕이<br>머무는 곳.</h1>
           <p class="lede">
-            매일 조금씩 쓴 글을 모아 두면,
-            어느 순간 한 권의 흐름이 생깁니다.
+            짧게 남긴 장면과 마음을 차곡차곡 쌓아 두세요.
+            안녕, 나의 바다는 그 기록이 한 권의 흐름으로 자라나는 과정을 보여줍니다.
           </p>
           <div class="actions">
             <NuxtLink class="button-primary" to="/app/write">지금 기록하기</NuxtLink>
@@ -48,7 +48,7 @@
             사라지거나 잊힙니다.
           </p>
           <p class="section-copy">
-            Book Maker는 짧은 기록을 잃지 않고 쌓아 두고,
+            안녕, 나의 바다는 짧은 기록을 잃지 않고 쌓아 두고,
             그것을 한 권의 흐름으로 묶는 공간입니다.
           </p>
         </div>

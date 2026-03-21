@@ -2,7 +2,7 @@
   <div>
     <header class="topbar">
       <div class="topbar-inner">
-        <NuxtLink class="brand" to="/">Book Maker</NuxtLink>
+        <NuxtLink class="brand" to="/">안녕, 나의 바다</NuxtLink>
         <nav class="nav">
           <NuxtLink to="/" exact-active-class="active">소개</NuxtLink>
           <NuxtLink to="/app/archive" active-class="active">아카이브</NuxtLink>
