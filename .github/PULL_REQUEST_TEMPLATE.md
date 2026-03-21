@@ -16,7 +16,8 @@
 
 ## 관련 문서 / 이슈
 
-- Issue:
+- Closes:
+- Related:
 - Docs:
 
 ## 체크리스트
