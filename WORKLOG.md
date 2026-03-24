@@ -10,6 +10,36 @@
 
 ---
 
+## 2026-03-25 (Auth baseline)
+
+### 완료
+
+- 이슈 `#15` 기준 사용자 / Auth 모듈 baseline 추가
+- `users`, `auth` 모듈과 JWT token / password hashing / Redis refresh session service 추가
+- `POST /auth/signup`, `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout`, `GET /auth/me` 구현
+- Bearer access token 기반 `AuthGuard`와 `CurrentUser` decorator 추가
+- auth env 설정과 `.env.example` 인증 키 추가
+- Auth 서비스 단위 테스트와 fake PostgreSQL / Redis 기반 e2e 테스트 추가
+
+### 현재 상태
+
+- API가 private-first writing을 위한 기본 인증 흐름을 제공한다
+- 회원가입, 로그인, 세션 갱신, 로그아웃, 현재 사용자 bootstrap이 가능한 상태다
+- 다음 엔트리/초안 API는 이 인증 guard와 사용자 스코프 기준 위에서 구현을 이어갈 수 있다
+
+### 다음 액션
+
+1. 기록 작성 API baseline 추가
+2. 엔트리 생성 / 수정 / 삭제와 autosave 기준 테스트 설계
+3. 인증 guard를 엔트리 도메인에 연결해 사용자 소유권 검증 시작
+
+### 메모
+
+- refresh token은 Redis에 hash 형태로 저장하고 refresh / logout 시 무효화한다
+- 현재 검증은 `pnpm --filter @book-maker/api lint:fix`, `typecheck`, `test`, `test:e2e` 기준으로 확인
+
+---
+
 ## 2026-03-25 (PostgreSQL schema / migration baseline)
 
 ### 완료
