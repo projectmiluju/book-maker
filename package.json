@@ -11,6 +11,7 @@
     "typecheck:web": "pnpm --filter @book-maker/web typecheck",
     "dev:api": "pnpm --filter @book-maker/api start:dev",
     "build:api": "pnpm --filter @book-maker/api build",
+    "db:migrate:api": "pnpm --filter @book-maker/api db:migrate",
     "lint:api": "pnpm --filter @book-maker/api lint",
     "lint:fix:api": "pnpm --filter @book-maker/api lint:fix",
     "typecheck:api": "pnpm --filter @book-maker/api typecheck",
