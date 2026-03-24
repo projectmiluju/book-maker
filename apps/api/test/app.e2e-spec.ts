@@ -12,6 +12,7 @@ import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 import request from 'supertest';
 
 import { AppModule } from './../src/app.module';
+import { EntryStatus } from './../src/entries/entry.types';
 import { DatabaseService } from './../src/infrastructure/database/database.service';
 import { RedisService } from './../src/infrastructure/redis/redis.service';
 import { applyGlobalAppConfig } from './../src/shared/apply-global-app-config';
@@ -51,6 +52,17 @@ type StoredUser = {
   updatedAt: Date;
 };
 
+type StoredEntry = {
+  id: string;
+  userId: string;
+  title: string | null;
+  body: string;
+  status: EntryStatus;
+  createdAt: Date;
+  updatedAt: Date;
+  lastSavedAt: Date;
+};
+
 type AuthResponseBody = {
   accessToken: string;
   refreshToken: string;
@@ -61,6 +73,16 @@ type AuthResponseBody = {
     createdAt: string;
     updatedAt: string;
   };
+};
+
+type EntryResponseBody = {
+  id: string;
+  title: string | null;
+  body: string;
+  status: EntryStatus;
+  createdAt: string;
+  updatedAt: string;
+  lastSavedAt: string;
 };
 
 class DuplicateEmailError extends Error {
@@ -74,56 +96,195 @@ class DuplicateEmailError extends Error {
 class FakePool {
   private readonly usersById = new Map<string, StoredUser>();
   private readonly usersByEmail = new Map<string, StoredUser>();
+  private readonly entriesById = new Map<string, StoredEntry>();
 
   query<T>(queryText: string, values: unknown[]) {
     const normalizedQuery = queryText.replace(/\s+/g, ' ').trim();
 
     if (normalizedQuery.startsWith('INSERT INTO users')) {
-      const email = values[0] as string;
-
-      if (this.usersByEmail.has(email)) {
-        return Promise.reject(new DuplicateEmailError());
-      }
-
-      const user: StoredUser = {
-        id: randomUUID(),
-        email,
-        passwordHash: values[1] as string,
-        displayName: values[2] as string,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-
-      this.usersById.set(user.id, user);
-      this.usersByEmail.set(user.email, user);
-
-      return Promise.resolve({
-        rows: [this.toRow(user)] as T[],
-      });
+      return this.insertUser<T>(values);
     }
 
     if (normalizedQuery.includes('FROM users WHERE email = $1')) {
-      const email = values[0] as string;
-      const user = this.usersByEmail.get(email);
-
-      return Promise.resolve({
-        rows: user ? ([this.toRow(user)] as T[]) : [],
-      });
+      return this.selectUserByEmail<T>(values);
     }
 
     if (normalizedQuery.includes('FROM users WHERE id = $1')) {
-      const id = values[0] as string;
-      const user = this.usersById.get(id);
+      return this.selectUserById<T>(values);
+    }
 
-      return Promise.resolve({
-        rows: user ? ([this.toRow(user)] as T[]) : [],
-      });
+    if (normalizedQuery.startsWith('INSERT INTO entries')) {
+      return this.insertEntry<T>(values);
+    }
+
+    if (
+      normalizedQuery.includes('FROM entries WHERE user_id = $1 ORDER BY updated_at DESC')
+    ) {
+      return this.listEntries<T>(values);
+    }
+
+    if (normalizedQuery.startsWith('DELETE FROM entries')) {
+      return this.deleteEntry(values);
+    }
+
+    if (normalizedQuery.includes('FROM entries WHERE id = $1 AND user_id = $2')) {
+      return this.selectEntryById<T>(values);
+    }
+
+    if (normalizedQuery.startsWith('UPDATE entries')) {
+      return this.updateEntry<T>(values);
     }
 
     return Promise.reject(new Error(`Unsupported fake query: ${normalizedQuery}`));
   }
 
-  private toRow(user: StoredUser) {
+  private insertUser<T>(values: unknown[]) {
+    const email = values[0] as string;
+
+    if (this.usersByEmail.has(email)) {
+      return Promise.reject(new DuplicateEmailError());
+    }
+
+    const user: StoredUser = {
+      id: randomUUID(),
+      email,
+      passwordHash: values[1] as string,
+      displayName: values[2] as string,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    this.usersById.set(user.id, user);
+    this.usersByEmail.set(user.email, user);
+
+    return Promise.resolve({
+      rows: [this.toUserRow(user)] as T[],
+    });
+  }
+
+  private selectUserByEmail<T>(values: unknown[]) {
+    const email = values[0] as string;
+    const user = this.usersByEmail.get(email);
+
+    return Promise.resolve({
+      rows: user ? ([this.toUserRow(user)] as T[]) : [],
+    });
+  }
+
+  private selectUserById<T>(values: unknown[]) {
+    const id = values[0] as string;
+    const user = this.usersById.get(id);
+
+    return Promise.resolve({
+      rows: user ? ([this.toUserRow(user)] as T[]) : [],
+    });
+  }
+
+  private insertEntry<T>(values: unknown[]) {
+    const now = new Date();
+    const entry: StoredEntry = {
+      id: randomUUID(),
+      userId: values[0] as string,
+      title: (values[1] as string | null) ?? null,
+      body: values[2] as string,
+      status: values[3] as EntryStatus,
+      createdAt: now,
+      updatedAt: now,
+      lastSavedAt: now,
+    };
+
+    this.entriesById.set(entry.id, entry);
+
+    return Promise.resolve({
+      rows: [this.toEntryRow(entry)] as T[],
+    });
+  }
+
+  private listEntries<T>(values: unknown[]) {
+    const userId = values[0] as string;
+    const entries = [...this.entriesById.values()]
+      .filter((entry) => entry.userId === userId)
+      .sort((left, right) => right.updatedAt.getTime() - left.updatedAt.getTime())
+      .map((entry) => this.toEntryRow(entry)) as T[];
+
+    return Promise.resolve({
+      rows: entries,
+    });
+  }
+
+  private selectEntryById<T>(values: unknown[]) {
+    const entryId = values[0] as string;
+    const userId = values[1] as string;
+    const entry = this.entriesById.get(entryId);
+
+    if (!entry || entry.userId !== userId) {
+      return Promise.resolve({
+        rows: [] as T[],
+      });
+    }
+
+    return Promise.resolve({
+      rows: [this.toEntryRow(entry)] as T[],
+    });
+  }
+
+  private updateEntry<T>(values: unknown[]) {
+    const entryId = values[0] as string;
+    const userId = values[1] as string;
+    const updateTitle = values[2] as boolean;
+    const title = values[3] as string | null;
+    const updateBody = values[4] as boolean;
+    const body = values[5] as string | null;
+    const updateStatus = values[6] as boolean;
+    const status = values[7] as EntryStatus | null;
+    const entry = this.entriesById.get(entryId);
+
+    if (!entry || entry.userId !== userId) {
+      return Promise.resolve({
+        rows: [] as T[],
+      });
+    }
+
+    if (updateTitle) {
+      entry.title = title;
+    }
+
+    if (updateBody && body !== null) {
+      entry.body = body;
+    }
+
+    if (updateStatus && status !== null) {
+      entry.status = status;
+    }
+
+    const now = new Date();
+    entry.updatedAt = now;
+    entry.lastSavedAt = now;
+
+    return Promise.resolve({
+      rows: [this.toEntryRow(entry)] as T[],
+    });
+  }
+
+  private deleteEntry(values: unknown[]) {
+    const entryId = values[0] as string;
+    const userId = values[1] as string;
+    const entry = this.entriesById.get(entryId);
+
+    if (!entry || entry.userId !== userId) {
+      return Promise.resolve({
+        rowCount: 0,
+      });
+    }
+
+    this.entriesById.delete(entryId);
+
+    return Promise.resolve({
+      rowCount: 1,
+    });
+  }
+
+  private toUserRow(user: StoredUser) {
     return {
       id: user.id,
       email: user.email,
@@ -131,6 +292,19 @@ class FakePool {
       displayName: user.displayName,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
+    };
+  }
+
+  private toEntryRow(entry: StoredEntry) {
+    return {
+      id: entry.id,
+      userId: entry.userId,
+      title: entry.title,
+      body: entry.body,
+      status: entry.status,
+      createdAt: entry.createdAt,
+      updatedAt: entry.updatedAt,
+      lastSavedAt: entry.lastSavedAt,
     };
   }
 }
@@ -225,7 +399,9 @@ describe('AppController (e2e)', () => {
   });
 
   afterEach(async () => {
-    await app.close();
+    if (app) {
+      await app.close();
+    }
   });
 
   it('/api/health (GET)', () => {
@@ -265,15 +441,7 @@ describe('AppController (e2e)', () => {
 
   it('signs up a user and exposes the current user through /auth/me', async () => {
     const server = app.getHttpServer();
-    const signupResponse = await request(server)
-      .post('/api/auth/signup')
-      .send({
-        email: 'sea@example.com',
-        password: 'password123',
-        displayName: '바다',
-      })
-      .expect(201);
-    const signupBody = signupResponse.body as AuthResponseBody;
+    const signupBody = await signup(server, 'sea@example.com');
 
     expect(signupBody.user.email).toBe('sea@example.com');
     expect(signupBody.accessToken).toEqual(expect.any(String));
@@ -301,11 +469,7 @@ describe('AppController (e2e)', () => {
   it('logs in an existing user with valid credentials', async () => {
     const server = app.getHttpServer();
 
-    await request(server).post('/api/auth/signup').send({
-      email: 'sea@example.com',
-      password: 'password123',
-      displayName: '바다',
-    });
+    await signup(server, 'sea@example.com');
 
     const loginResponse = await request(server)
       .post('/api/auth/login')
@@ -322,15 +486,7 @@ describe('AppController (e2e)', () => {
 
   it('rotates refresh tokens and revokes them on logout', async () => {
     const server = app.getHttpServer();
-    const signupResponse = await request(server)
-      .post('/api/auth/signup')
-      .send({
-        email: 'sea@example.com',
-        password: 'password123',
-        displayName: '바다',
-      })
-      .expect(201);
-    const signupBody = signupResponse.body as AuthResponseBody;
+    const signupBody = await signup(server, 'sea@example.com');
 
     const refreshResponse = await request(server)
       .post('/api/auth/refresh')
@@ -364,4 +520,117 @@ describe('AppController (e2e)', () => {
       })
       .expect(401);
   });
+
+  it('creates, lists, reads, updates, and deletes an entry inside the current user scope', async () => {
+    const server = app.getHttpServer();
+    const auth = await signup(server, 'sea@example.com');
+
+    const createResponse = await request(server)
+      .post('/api/entries')
+      .set('Authorization', `Bearer ${auth.accessToken}`)
+      .send({
+        title: '  바다 메모  ',
+        body: '첫 문장',
+      })
+      .expect(201);
+    const createdEntry = createResponse.body as EntryResponseBody;
+
+    expect(createdEntry.title).toBe('바다 메모');
+    expect(createdEntry.body).toBe('첫 문장');
+    expect(createdEntry.status).toBe('draft');
+
+    const listResponse = await request(server)
+      .get('/api/entries')
+      .set('Authorization', `Bearer ${auth.accessToken}`)
+      .expect(200);
+    const listBody = listResponse.body as EntryResponseBody[];
+
+    expect(listBody).toHaveLength(1);
+    expect(listBody[0].id).toBe(createdEntry.id);
+
+    await request(server)
+      .get(`/api/entries/${createdEntry.id}`)
+      .set('Authorization', `Bearer ${auth.accessToken}`)
+      .expect(200)
+      .expect({
+        ...createdEntry,
+      });
+
+    const updateResponse = await request(server)
+      .patch(`/api/entries/${createdEntry.id}`)
+      .set('Authorization', `Bearer ${auth.accessToken}`)
+      .send({
+        title: '',
+        body: '수정된 문장',
+        status: 'completed',
+      })
+      .expect(200);
+    const updatedEntry = updateResponse.body as EntryResponseBody;
+
+    expect(updatedEntry.title).toBeNull();
+    expect(updatedEntry.body).toBe('수정된 문장');
+    expect(updatedEntry.status).toBe('completed');
+    expect(new Date(updatedEntry.lastSavedAt).getTime()).toBeGreaterThanOrEqual(
+      new Date(createdEntry.lastSavedAt).getTime(),
+    );
+
+    await request(server)
+      .delete(`/api/entries/${createdEntry.id}`)
+      .set('Authorization', `Bearer ${auth.accessToken}`)
+      .expect(200)
+      .expect({
+        success: true,
+      });
+
+    await request(server)
+      .get(`/api/entries/${createdEntry.id}`)
+      .set('Authorization', `Bearer ${auth.accessToken}`)
+      .expect(404);
+  });
+
+  it('blocks access to another user entry', async () => {
+    const server = app.getHttpServer();
+    const owner = await signup(server, 'owner@example.com');
+    const stranger = await signup(server, 'other@example.com');
+
+    const createResponse = await request(server)
+      .post('/api/entries')
+      .set('Authorization', `Bearer ${owner.accessToken}`)
+      .send({
+        body: 'owner entry',
+      })
+      .expect(201);
+    const createdEntry = createResponse.body as EntryResponseBody;
+
+    await request(server)
+      .get(`/api/entries/${createdEntry.id}`)
+      .set('Authorization', `Bearer ${stranger.accessToken}`)
+      .expect(404);
+
+    await request(server)
+      .patch(`/api/entries/${createdEntry.id}`)
+      .set('Authorization', `Bearer ${stranger.accessToken}`)
+      .send({
+        body: 'stolen',
+      })
+      .expect(404);
+
+    await request(server)
+      .delete(`/api/entries/${createdEntry.id}`)
+      .set('Authorization', `Bearer ${stranger.accessToken}`)
+      .expect(404);
+  });
 });
+
+async function signup(server: ReturnType<INestApplication['getHttpServer']>, email: string) {
+  const response = await request(server)
+    .post('/api/auth/signup')
+    .send({
+      email,
+      password: 'password123',
+      displayName: '바다',
+    })
+    .expect(201);
+
+  return response.body as AuthResponseBody;
+}
