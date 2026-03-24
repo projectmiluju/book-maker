@@ -6,4 +6,5 @@ export const databaseConfig = registerAs('database', () => ({
   database: process.env.POSTGRES_DB ?? 'book_maker',
   username: process.env.POSTGRES_USER ?? 'book_maker',
   password: process.env.POSTGRES_PASSWORD ?? 'book_maker',
+  connectOnBootstrap: process.env.POSTGRES_CONNECT_ON_BOOTSTRAP !== 'false',
 }));

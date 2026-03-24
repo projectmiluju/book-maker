@@ -42,7 +42,10 @@ describe('AppController (e2e)', () => {
   let app: INestApplication;
 
   beforeEach(async () => {
+    process.env.NODE_ENV = 'test';
     process.env.API_PREFIX = 'api';
+    process.env.POSTGRES_CONNECT_ON_BOOTSTRAP = 'false';
+    process.env.REDIS_CONNECT_ON_BOOTSTRAP = 'false';
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [TestAppModule],
@@ -63,6 +66,10 @@ describe('AppController (e2e)', () => {
     return request(server).get('/api/health').expect(200).expect({
       status: 'ok',
       service: 'book-maker-api',
+      dependencies: {
+        postgres: 'disabled',
+        redis: 'disabled',
+      },
     });
   });
 

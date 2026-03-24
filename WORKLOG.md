@@ -10,6 +10,38 @@
 
 ---
 
+## 2026-03-24 (PostgreSQL / Redis baseline)
+
+### 완료
+
+- 이슈 `#11` 기준 PostgreSQL / Redis infrastructure baseline 추가
+- `pg`, `redis` client 의존성 추가
+- `InfrastructureModule`, `DatabaseService`, `RedisService` 추가
+- config namespace를 사용하는 DB/Redis 연결 설정 helper 분리
+- 부트 시 연결 여부를 제어하는 env 키와 기본값 추가
+- health 응답에 PostgreSQL / Redis 상태 포함
+- 단위 테스트와 e2e 테스트로 비연결 테스트 환경 baseline 확인
+- Docker Compose와 실제 API 부트로 로컬 PostgreSQL / Redis 연결 준비 상태 확인
+
+### 현재 상태
+
+- API가 PostgreSQL / Redis provider를 전역으로 재사용할 수 있는 구조를 갖췄다
+- 기본 실행 환경에서는 앱 시작 시 두 연결을 확인하고 실패를 바로 드러낸다
+- 테스트 환경에서는 bootstrap 연결을 비활성화해 로컬 의존성 없이 검증 가능하다
+
+### 다음 액션
+
+1. PostgreSQL 스키마와 migration baseline 결정
+2. 사용자 / 인증 모듈에서 DB와 Redis provider를 실제 사용하도록 연결
+3. 인증 세션과 사용자 엔티티 기준 테스트 설계 시작
+
+### 메모
+
+- 로컬 실연결 확인은 `docker compose up -d postgres redis` 후 `pnpm --filter @book-maker/api start`, `curl http://127.0.0.1:4000/api/health`로 확인
+- 샌드박스에서는 로컬 포트 접속 제한으로 실연결 검증이 막혀 권한 상승으로 확인
+
+---
+
 ## 2026-03-24
 
 ### 완료
