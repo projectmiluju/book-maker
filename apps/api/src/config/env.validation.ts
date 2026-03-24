@@ -6,6 +6,11 @@ export type EnvironmentVariables = {
   NODE_ENV: NodeEnv;
   API_PORT: number;
   API_PREFIX: string;
+  AUTH_ACCESS_TOKEN_SECRET: string;
+  AUTH_ACCESS_TOKEN_EXPIRES_IN: string;
+  AUTH_REFRESH_TOKEN_SECRET: string;
+  AUTH_REFRESH_TOKEN_EXPIRES_IN: string;
+  AUTH_REFRESH_SESSION_PREFIX: string;
   POSTGRES_HOST: string;
   POSTGRES_PORT: number;
   POSTGRES_DB: string;
@@ -109,6 +114,31 @@ export function validateEnvironment(
     NODE_ENV: nodeEnv as NodeEnv,
     API_PORT: readNumber(input, 'API_PORT', 4000),
     API_PREFIX: readString(input, 'API_PREFIX', 'api'),
+    AUTH_ACCESS_TOKEN_SECRET: readString(
+      input,
+      'AUTH_ACCESS_TOKEN_SECRET',
+      'book-maker-access-secret',
+    ),
+    AUTH_ACCESS_TOKEN_EXPIRES_IN: readString(
+      input,
+      'AUTH_ACCESS_TOKEN_EXPIRES_IN',
+      '15m',
+    ),
+    AUTH_REFRESH_TOKEN_SECRET: readString(
+      input,
+      'AUTH_REFRESH_TOKEN_SECRET',
+      'book-maker-refresh-secret',
+    ),
+    AUTH_REFRESH_TOKEN_EXPIRES_IN: readString(
+      input,
+      'AUTH_REFRESH_TOKEN_EXPIRES_IN',
+      '14d',
+    ),
+    AUTH_REFRESH_SESSION_PREFIX: readString(
+      input,
+      'AUTH_REFRESH_SESSION_PREFIX',
+      'auth:refresh',
+    ),
     POSTGRES_HOST: readString(input, 'POSTGRES_HOST', '127.0.0.1'),
     POSTGRES_PORT: readNumber(input, 'POSTGRES_PORT', 5432),
     POSTGRES_DB: readString(input, 'POSTGRES_DB', 'book_maker'),

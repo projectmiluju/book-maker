@@ -42,6 +42,14 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     this.logger.log('Redis connection baseline is ready.');
   }
 
+  async ensureConnected() {
+    if (!this.client.isOpen) {
+      await this.client.connect();
+    }
+
+    return this.client;
+  }
+
   async onModuleDestroy() {
     if (this.client.isOpen) {
       await this.client.quit();
