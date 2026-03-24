@@ -10,6 +10,37 @@
 
 ---
 
+## 2026-03-25 (Entry API / autosave baseline)
+
+### 완료
+
+- 이슈 `#17` 기준 `entries` 모듈과 entry API baseline 추가
+- PostgreSQL `entries` 테이블 migration `0002_create_entries.sql` 추가
+- `POST /entries`, `GET /entries`, `GET /entries/:id`, `PATCH /entries/:id`, `DELETE /entries/:id` 구현
+- title/body/status DTO와 public entry 응답 구조 추가
+- `PATCH /entries/:id`에서 `updatedAt`, `lastSavedAt`를 함께 갱신하는 autosave 기준 반영
+- AuthGuard를 연결한 사용자별 entry ownership 검증 추가
+- Entries 서비스 단위 테스트와 fake PostgreSQL / Redis 기반 e2e 테스트 보강
+
+### 현재 상태
+
+- 인증된 사용자가 자신의 기록을 생성, 조회, 수정, 삭제할 수 있는 API 기준이 생겼다
+- autosave에 필요한 `lastSavedAt` 갱신 규칙과 ownership 경계가 backend에서 검증된다
+- 다음 단계인 아카이브 UI/API 또는 기록 작성 화면 연결 작업을 이 API 위에서 이어갈 수 있다
+
+### 다음 액션
+
+1. 기록 작성 화면을 실제 entry create/update API에 연결
+2. autosave 상태 표시와 저장 실패 UI 흐름 구현
+3. 아카이브 목록/상세 화면을 entry list/detail API와 연결
+
+### 메모
+
+- entry API 검증은 `pnpm --filter @book-maker/api lint`, `typecheck`, `test`, `test:e2e` 기준으로 확인
+- e2e에서는 fake PostgreSQL / Redis provider로 CRUD, ownership, autosave 갱신 계약을 검증
+
+---
+
 ## 2026-03-25 (Auth baseline)
 
 ### 완료
