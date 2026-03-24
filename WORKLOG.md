@@ -10,6 +10,37 @@
 
 ---
 
+## 2026-03-25 (PostgreSQL schema / migration baseline)
+
+### 완료
+
+- 이슈 `#13` 기준 PostgreSQL schema / migration baseline 추가
+- 루트 `db:migrate:api`, API `db:migrate` 스크립트 추가
+- SQL 기반 migration runner 추가
+- `schema_migrations` 테이블을 사용하는 migration 기록 기준 추가
+- 초기 migration `0001_create_users.sql` 추가
+- `users` 테이블 baseline과 `pgcrypto` extension 적용
+- Docker Compose PostgreSQL에 migration 적용 및 재실행 안전성 확인
+
+### 현재 상태
+
+- 로컬 PostgreSQL에 초기 스키마를 적용할 수 있는 실행 흐름이 생겼다
+- `users` 테이블과 migration 기록 테이블이 실제 DB에 생성되는 것을 확인했다
+- 이후 인증/사용자 모듈은 migration baseline 위에서 구현을 이어갈 수 있다
+
+### 다음 액션
+
+1. 사용자 / 인증 모듈 골격 추가
+2. 회원가입과 로그인에 필요한 비밀번호 해싱, JWT, Redis 세션 제어 설계
+3. 인증 API 기준 단위 / 통합 테스트 추가
+
+### 메모
+
+- 실 DB 검증은 `docker compose up -d postgres`, `pnpm db:migrate:api`, `docker compose exec -T postgres psql ...` 순서로 확인
+- migration 재실행 시 `No pending migrations.`를 확인해 idempotent baseline을 검증
+
+---
+
 ## 2026-03-24 (PostgreSQL / Redis baseline)
 
 ### 완료
