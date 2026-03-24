@@ -10,6 +10,37 @@
 
 ---
 
+## 2026-03-24
+
+### 완료
+
+- 이슈 `#9` 기준 NestJS config / env / validation baseline 추가
+- `@nestjs/config` 기반 전역 ConfigModule 로딩 구성
+- `app`, `database`, `redis` 설정 네임스페이스 분리
+- 환경 변수 기본값 및 숫자/enum 검증 로직 추가
+- 전역 `ValidationPipe`와 bootstrap 공통 설정 함수 추가
+- API 단위 테스트와 e2e 테스트로 env 검증 및 전역 validation 동작 확인
+- `.env.example`에 API / PostgreSQL / Redis 기준 키 보강
+
+### 현재 상태
+
+- API가 `process.env` 직접 참조 대신 공통 config 계층을 통해 설정을 읽는다
+- 이후 PostgreSQL / Redis 연결 모듈이 같은 설정 키 구조를 재사용할 수 있다
+- DTO 검증과 변환 baseline이 전역으로 적용될 준비가 됐다
+
+### 다음 액션
+
+1. PostgreSQL / Redis 실제 연결 모듈 추가
+2. Config 값을 사용하는 DB/Redis provider 또는 infrastructure module 구성
+3. 인증 기초 구현을 위한 사용자 / auth 모듈 골격 시작
+
+### 메모
+
+- 현재 env 검증은 커스텀 validator로 유지하고 있으며, 필요 시 추후 schema 기반 검증으로 확장 가능
+- 전역 app 설정 함수는 `main.ts`와 e2e 테스트가 같은 bootstrap 규칙을 공유하도록 분리
+
+---
+
 ## 2026-03-21
 
 ### 완료
