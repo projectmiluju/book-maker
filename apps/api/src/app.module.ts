@@ -6,6 +6,7 @@ import { databaseConfig } from './config/database.config';
 import { validateEnvironment } from './config/env.validation';
 import { redisConfig } from './config/redis.config';
 import { HealthModule } from './health/health.module';
+import { InfrastructureModule } from './infrastructure/infrastructure.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { HealthModule } from './health/health.module';
       load: [appConfig, databaseConfig, redisConfig],
       validate: validateEnvironment,
     }),
+    InfrastructureModule,
     HealthModule,
   ],
 })

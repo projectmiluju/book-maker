@@ -11,8 +11,11 @@ export type EnvironmentVariables = {
   POSTGRES_DB: string;
   POSTGRES_USER: string;
   POSTGRES_PASSWORD: string;
+  POSTGRES_CONNECT_ON_BOOTSTRAP: boolean;
   REDIS_HOST: string;
   REDIS_PORT: number;
+  REDIS_DB: number;
+  REDIS_CONNECT_ON_BOOTSTRAP: boolean;
 };
 
 function readString(
@@ -61,6 +64,36 @@ function readNumber(
   throw new Error(`Environment variable ${key} must be a valid number.`);
 }
 
+function readBoolean(
+  input: Record<string, unknown>,
+  key: string,
+  fallback?: boolean,
+): boolean {
+  const value = input[key];
+
+  if (typeof value === 'boolean') {
+    return value;
+  }
+
+  if (typeof value === 'string' && value.trim().length > 0) {
+    if (value === 'true') {
+      return true;
+    }
+
+    if (value === 'false') {
+      return false;
+    }
+
+    throw new Error(`Environment variable ${key} must be true or false.`);
+  }
+
+  if (fallback !== undefined) {
+    return fallback;
+  }
+
+  throw new Error(`Environment variable ${key} must be true or false.`);
+}
+
 export function validateEnvironment(
   input: Record<string, unknown>,
 ): EnvironmentVariables {
@@ -81,7 +114,18 @@ export function validateEnvironment(
     POSTGRES_DB: readString(input, 'POSTGRES_DB', 'book_maker'),
     POSTGRES_USER: readString(input, 'POSTGRES_USER', 'book_maker'),
     POSTGRES_PASSWORD: readString(input, 'POSTGRES_PASSWORD', 'book_maker'),
+    POSTGRES_CONNECT_ON_BOOTSTRAP: readBoolean(
+      input,
+      'POSTGRES_CONNECT_ON_BOOTSTRAP',
+      nodeEnv !== 'test',
+    ),
     REDIS_HOST: readString(input, 'REDIS_HOST', '127.0.0.1'),
     REDIS_PORT: readNumber(input, 'REDIS_PORT', 6379),
+    REDIS_DB: readNumber(input, 'REDIS_DB', 0),
+    REDIS_CONNECT_ON_BOOTSTRAP: readBoolean(
+      input,
+      'REDIS_CONNECT_ON_BOOTSTRAP',
+      nodeEnv !== 'test',
+    ),
   };
 }
