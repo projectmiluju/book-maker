@@ -10,6 +10,35 @@
 
 ---
 
+## 2026-03-25 (Archive list / detail integration)
+
+### 완료
+
+- 이슈 `#21` 기준 `apps/web` 아카이브 목록 화면을 실제 entry list API에 연결
+- `GET /entries` 기반 list state, empty state, error state UI 추가
+- `/app/entries/[id]` 상세 화면을 추가하고 `GET /entries/:id` 연결
+- `useEntriesArchive` composable과 archive/detail 조회 테스트 추가
+- write 화면에서 방금 저장한 기록을 archive/detail로 이동하는 링크 추가
+
+### 현재 상태
+
+- 사용자는 프론트에서 저장한 기록을 아카이브 목록에서 다시 찾고 상세 화면으로 열 수 있다
+- 아카이브는 인증 세션, 로딩, 빈 상태, 조회 실패를 구분해 보여준다
+- write -> archive -> detail -> write 재진입 흐름이 한 사이클로 이어진다
+
+### 다음 액션
+
+1. `/login`, `/signup` 전용 인증 화면과 app auth middleware를 정리
+2. draft 생성 baseline과 entry 선택 흐름을 시작한다
+3. archive/detail 조회에 대한 component 또는 page-level 테스트 범위를 넓힌다
+
+### 메모
+
+- 프론트 검증은 `pnpm --filter @book-maker/web lint`, `typecheck`, `test`, `build` 기준으로 확인
+- archive/detail 리스크는 composable 테스트로 list loaded/empty와 detail error 경계를 먼저 고정했다
+
+---
+
 ## 2026-03-25 (Write UI / autosave integration)
 
 ### 완료
