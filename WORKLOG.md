@@ -10,6 +10,37 @@
 
 ---
 
+## 2026-03-25 (Write UI / autosave integration)
+
+### 완료
+
+- 이슈 `#19` 기준 `apps/web` 기록 작성 화면을 실제 auth / entry API에 연결
+- runtime config 기반 `NUXT_PUBLIC_API_BASE`와 fetch client 추가
+- 로컬 세션 저장 composable과 inline signup / login 흐름 추가
+- `useEntryEditor` composable로 entry create 후 debounced update autosave 흐름 구현
+- 저장 중 / 저장됨 / 저장 실패 / 세션 만료 상태 UI와 재시도 흐름 추가
+- `entryId` query 기반 기존 기록 불러오기 연결
+- Vitest 기반 프론트 autosave 상태 테스트 추가
+
+### 현재 상태
+
+- 프론트에서 인증 세션을 만든 뒤 같은 write 화면에서 바로 기록 생성과 자동 저장을 확인할 수 있다
+- 첫 저장은 create API, 이후 저장은 update API로 이어지는 흐름이 화면 상태와 함께 동작한다
+- access token 만료 시 autosave가 `세션 확인 필요` 상태로 전환되고 사용자가 원인을 볼 수 있다
+
+### 다음 액션
+
+1. 아카이브 목록/상세 화면을 entry list/detail API와 연결
+2. `/login`, `/signup` 전용 인증 화면과 app auth middleware를 정리
+3. write 화면에서 생성된 entry를 archive/detail 흐름과 자연스럽게 연결
+
+### 메모
+
+- 프론트 검증은 `pnpm --filter @book-maker/web lint`, `typecheck`, `test`, `build` 기준으로 확인
+- autosave 핵심 리스크는 composable 단위 테스트로 `saving -> saved`, `401 -> auth-required` 전환을 검증
+
+---
+
 ## 2026-03-25 (Entry API / autosave baseline)
 
 ### 완료

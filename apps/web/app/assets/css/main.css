@@ -645,6 +645,10 @@ textarea {
   background: var(--bg);
 }
 
+.writer-shell {
+  width: min(600px, 100%);
+}
+
 .writer-sheet {
   width: min(600px, 100%);
   background: var(--surface);
@@ -659,6 +663,20 @@ textarea {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.dot-status[data-tone='error'],
+.dot-status[data-tone='auth-required'] {
+  color: #9b3a31;
+}
+
+.dot-status[data-tone='saved'] {
+  color: #2e5d45;
+}
+
+.dot-status[data-tone='saving'],
+.dot-status[data-tone='pending'] {
+  color: var(--accent);
 }
 
 .writer-meta {
@@ -698,6 +716,88 @@ textarea {
   padding-top: 20px;
   border-top: 1px solid var(--line);
   margin-top: 36px;
+}
+
+.writer-auth-card {
+  width: min(600px, 100%);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.writer-auth-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.writer-auth-title {
+  font-size: clamp(28px, 3vw, 42px);
+  line-height: 1.12;
+  letter-spacing: -0.04em;
+}
+
+.writer-auth-copy {
+  font-size: 15px;
+  color: var(--text-muted);
+  line-height: 1.75;
+}
+
+.writer-auth-switch {
+  display: flex;
+  gap: 8px;
+}
+
+.writer-auth-switch .button-ghost[data-active='true'] {
+  background: var(--surface-low);
+  color: var(--text);
+}
+
+.writer-auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.writer-auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.writer-auth-field span {
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+.writer-auth-field input {
+  min-height: 48px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  padding: 0 14px;
+}
+
+.writer-alert {
+  margin-top: 18px;
+  padding: 14px 16px;
+  background: var(--surface-low);
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.writer-alert-error {
+  background: rgba(155, 58, 49, 0.08);
+  color: #8d2e25;
+}
+
+.writer-alert-action {
+  margin-left: 8px;
+  text-decoration: underline;
 }
 
 /* ============================================
