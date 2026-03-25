@@ -60,6 +60,11 @@ export function createEntriesApiClient(
   fetcher: Fetcher = globalThis.fetch,
 ) {
   return {
+    listEntries() {
+      return requestJson<PublicEntry[]>(fetcher, baseUrl, '/entries', {
+        headers: createAuthHeaders(getAccessToken),
+      });
+    },
     createEntry(input: EntryInput) {
       return requestJson<PublicEntry>(fetcher, baseUrl, '/entries', {
         method: 'POST',
