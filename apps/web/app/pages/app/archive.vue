@@ -1,48 +1,82 @@
 <script setup lang="ts">
+import { computed, watch } from 'vue';
+
+import { useAuthSession } from '../../composables/useAuthSession';
+import { useEntriesArchive } from '../../composables/useEntriesArchive';
+import { createEntriesApiClient } from '../../utils/api';
+import { groupEntriesByMonth } from '../../utils/entry-format';
+
 definePageMeta({ layout: 'app' });
 
-const marchEntries = [
-  {
-    date: '03.18',
-    title: '창가에 남은 빛',
-    body: '저녁빛이 식탁 위를 천천히 지나가던 순간을 붙잡아 두고 싶었다.',
-  },
-  {
-    date: '03.12',
-    title: '대답 없는 전화',
-    body: '울리지 않은 전화보다, 울렸는데도 받지 못한 순간이 더 오래 남는다.',
-  },
-  {
-    date: '03.01',
-    title: '메모해 두고 싶었던 문장',
-    body: '우리는 대체로 큰 사건보다 작은 반복 속에서 변해 간다.',
-  },
-];
+const runtimeConfig = useRuntimeConfig();
+const route = useRoute();
 
-const febEntries = [
-  {
-    date: '02.21',
-    title: '혼자 먹는 점심',
-    body: '아무도 없는 식당에서 창밖을 보며 먹는 밥이 오히려 더 오래 기억된다.',
-  },
-  {
-    date: '02.09',
-    title: '버스 안에서',
-    body: '이어폰을 꽂은 채 멍하니 창밖을 보던 그 시간이 사실 가장 나다운 시간이었다.',
-  },
-];
+const {
+  hydrated,
+  isAuthenticated,
+  accessToken,
+  user,
+  hydrateFromStorage,
+} = useAuthSession();
 
-const totalCount = marchEntries.length + febEntries.length;
+const entriesApi = createEntriesApiClient(
+  runtimeConfig.public.apiBase,
+  () => accessToken.value,
+);
+const archive = useEntriesArchive({
+  api: entriesApi,
+});
+const {
+  entries,
+  listError,
+  listState,
+  loadEntries,
+} = archive;
+
+const groupedEntries = computed(() => groupEntriesByMonth(entries.value));
+const highlightedEntryId = computed(() =>
+  typeof route.query.entryId === 'string' ? route.query.entryId : null,
+);
+
+watch(
+  [hydrated, isAuthenticated],
+  async ([isHydrated, authenticated]) => {
+    if (!isHydrated || !authenticated) {
+      return;
+    }
+
+    if (listState.value !== 'idle') {
+      return;
+    }
+
+    await loadEntries();
+  },
+  { immediate: true },
+);
+
+onMounted(() => {
+  hydrateFromStorage();
+});
 </script>
 
 <template>
   <main class="app-grid">
     <aside class="sidebar">
       <div>
-        <div class="sidebar-badge">현재 초안</div>
+        <div class="sidebar-badge">아카이브</div>
         <div class="sidebar-current">
-          <div class="sidebar-title">고요가 머무는 자리</div>
-          <div class="sidebar-copy">기록 3개 · 작성 중</div>
+          <div class="sidebar-title">
+            {{ user?.displayName ?? '기록을 다시 펼쳐보는 곳' }}
+          </div>
+          <div class="sidebar-copy">
+            {{
+              isAuthenticated
+                ? listState === 'loaded'
+                  ? `기록 ${entries.length}개`
+                  : '기록을 불러오는 중'
+                : '세션이 필요합니다'
+            }}
+          </div>
         </div>
       </div>
 
@@ -62,40 +96,75 @@ const totalCount = marchEntries.length + febEntries.length;
       <div class="page-header">
         <div>
           <h1 class="page-title">아카이브</h1>
-          <p class="page-subtitle">지금까지 쓴 기록 전체입니다.</p>
+          <p class="page-subtitle">지금까지 쓴 기록을 날짜순으로 다시 펼쳐봅니다.</p>
         </div>
         <div class="page-tools">
-          <span class="entry-meta">{{ totalCount }}개</span>
+          <span class="entry-meta">
+            {{ listState === 'loaded' ? `${entries.length}개` : '개인 기록' }}
+          </span>
           <NuxtLink class="button-primary" to="/app/write">새 기록</NuxtLink>
         </div>
       </div>
 
-      <div class="archive-list">
-        <div class="archive-month">
-          <span class="archive-month-label">2026년 3월</span>
-        </div>
-        <article v-for="entry in marchEntries" :key="entry.date" class="archive-item">
-          <time class="archive-item-date">{{ entry.date }}</time>
-          <div class="archive-item-body">
-            <h2 class="archive-item-title">{{ entry.title }}</h2>
-            <p class="archive-item-preview">{{ entry.body }}</p>
-          </div>
-        </article>
-
-        <div class="archive-month">
-          <span class="archive-month-label">2026년 2월</span>
-        </div>
-        <article v-for="entry in febEntries" :key="entry.date" class="archive-item">
-          <time class="archive-item-date">{{ entry.date }}</time>
-          <div class="archive-item-body">
-            <h2 class="archive-item-title">{{ entry.title }}</h2>
-            <p class="archive-item-preview">{{ entry.body }}</p>
-          </div>
-        </article>
+      <div v-if="!hydrated" class="archive-state-card">
+        <p class="archive-state-copy">저장된 세션을 확인하고 있습니다.</p>
       </div>
 
-      <div class="archive-folio">
-        <span>{{ totalCount }}개의 기록</span>
+      <div v-else-if="!isAuthenticated" class="archive-state-card">
+        <p class="archive-state-copy">
+          아카이브를 보려면 먼저 로그인해야 합니다. 현재 단계에서는 기록하기 화면에서 바로 세션을 만들 수 있습니다.
+        </p>
+        <NuxtLink class="button-primary" to="/app/write">기록하기로 이동</NuxtLink>
+      </div>
+
+      <div v-else-if="listState === 'loading'" class="archive-state-card">
+        <p class="archive-state-copy">기록을 불러오는 중입니다.</p>
+      </div>
+
+      <div v-else-if="listState === 'error'" class="archive-state-card">
+        <p class="archive-state-copy">{{ listError }}</p>
+        <button class="button-ghost" type="button" @click="loadEntries">
+          다시 불러오기
+        </button>
+      </div>
+
+      <div v-else-if="listState === 'empty'" class="archive-state-card">
+        <p class="archive-state-copy">
+          아직 쌓인 기록이 없습니다. 첫 기록을 남기면 이곳에서 다시 찾아볼 수 있습니다.
+        </p>
+        <NuxtLink class="button-primary" to="/app/write">첫 기록 남기기</NuxtLink>
+      </div>
+
+      <div v-else class="archive-list">
+        <p v-if="highlightedEntryId" class="archive-banner">
+          방금 저장한 기록이 아카이브에 반영되었습니다.
+        </p>
+
+        <div v-for="group in groupedEntries" :key="group.key">
+          <div class="archive-month">
+            <span class="archive-month-label">{{ group.label }}</span>
+          </div>
+
+          <NuxtLink
+            v-for="item in group.entries"
+            :key="item.entry.id"
+            class="archive-item"
+            :class="{ 'archive-item-active': highlightedEntryId === item.entry.id }"
+            :to="`/app/entries/${item.entry.id}`"
+          >
+            <time class="archive-item-date">{{ item.dayLabel }}</time>
+            <div class="archive-item-body">
+              <h2 class="archive-item-title">
+                {{ item.entry.title ?? '제목 없는 기록' }}
+              </h2>
+              <p class="archive-item-preview">{{ item.preview }}</p>
+            </div>
+          </NuxtLink>
+        </div>
+      </div>
+
+      <div v-if="listState === 'loaded'" class="archive-folio">
+        <span>{{ entries.length }}개의 기록</span>
       </div>
     </section>
   </main>

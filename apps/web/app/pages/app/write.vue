@@ -69,6 +69,14 @@ const saveStatusLabel = computed(() => statusLabelMap[saveState.value]);
 const entryDateLabel = computed(() =>
   formatDate(createdAt.value ?? new Date().toISOString()),
 );
+const savedArchiveLink = computed(() =>
+  lastSavedAt.value && editor.entryId.value
+    ? {
+        archive: `/app/archive?entryId=${editor.entryId.value}`,
+        detail: `/app/entries/${editor.entryId.value}`,
+      }
+    : null,
+);
 const saveSummary = computed(() => {
   if (saveState.value === 'saved' && lastSavedAt.value) {
     return `${formatTime(lastSavedAt.value)}에 저장됨`;
@@ -203,6 +211,13 @@ function formatTime(value: string) {
         >
           {{ logoutPending ? '세션 정리 중...' : '로그아웃' }}
         </button>
+        <NuxtLink
+          v-if="savedArchiveLink"
+          class="button-ghost"
+          :to="savedArchiveLink.detail"
+        >
+          방금 기록 보기
+        </NuxtLink>
         <NuxtLink class="button-ghost" to="/app/archive">아카이브로</NuxtLink>
       </div>
     </aside>
@@ -341,6 +356,15 @@ function formatTime(value: string) {
                 : '나만 볼 수 있습니다'
             }}
           </span>
+        </div>
+
+        <div v-if="savedArchiveLink" class="writer-links">
+          <NuxtLink class="button-ghost" :to="savedArchiveLink.archive">
+            아카이브에서 확인
+          </NuxtLink>
+          <NuxtLink class="button-ghost" :to="savedArchiveLink.detail">
+            상세로 열기
+          </NuxtLink>
         </div>
       </article>
     </section>

@@ -578,6 +578,10 @@ textarea {
   color: var(--accent);
 }
 
+.archive-item-active {
+  background: rgba(31, 46, 69, 0.04);
+}
+
 .archive-item-date {
   font-size: 12px;
   color: var(--text-faint);
@@ -624,6 +628,73 @@ textarea {
   width: 40px;
   height: 1px;
   background: var(--line-strong);
+}
+
+.archive-state-card,
+.entry-detail-card {
+  max-width: 760px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: 32px;
+}
+
+.archive-state-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.archive-state-copy {
+  font-size: 15px;
+  color: var(--text-muted);
+  line-height: 1.75;
+}
+
+.archive-banner {
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  background: rgba(31, 46, 69, 0.06);
+  color: var(--accent);
+  font-size: 13px;
+}
+
+.entry-detail-meta {
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+.entry-detail-title {
+  font-size: clamp(32px, 4vw, 54px);
+  line-height: 1.06;
+  letter-spacing: -0.04em;
+  margin-top: 18px;
+}
+
+.entry-detail-preview {
+  font-size: 15px;
+  color: var(--text-muted);
+  line-height: 1.75;
+  margin-top: 18px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.entry-detail-body {
+  white-space: pre-wrap;
+  font-size: 17px;
+  line-height: 1.95;
+  margin-top: 28px;
+}
+
+.entry-detail-footer {
+  margin-top: 36px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
 }
 
 /* ============================================
@@ -716,6 +787,12 @@ textarea {
   padding-top: 20px;
   border-top: 1px solid var(--line);
   margin-top: 36px;
+}
+
+.writer-links {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
 }
 
 .writer-auth-card {
