@@ -10,6 +10,36 @@
 
 ---
 
+## 2026-03-26 (Draft web integration)
+
+### 완료
+
+- 이슈 `#25` 기준 `apps/web` 초안 목록/상세 화면을 실제 draft API에 연결
+- `app/types/drafts.ts`, `useDrafts` composable, draft API client를 추가해 초안 조회/생성/entry 추가 흐름 연결
+- `/app/drafts`를 목록 + 빈 초안 생성 화면으로 재구성하고 `/app/drafts/[id]` 상세 화면 추가
+- draft detail에서 초안에 담긴 기록과 아직 담지 않은 기록을 함께 보여주고 선택 첨부 UI 추가
+- loading / empty / error / unauthenticated 상태를 목록/상세 화면에 반영
+- `useDrafts.spec.ts`로 초안 목록/상세/생성/첨부 기본 상태 테스트 추가
+
+### 현재 상태
+
+- 사용자는 프론트에서 저장된 초안 목록을 보고, 새 초안을 만든 뒤 상세 화면에서 기록을 초안에 담기 시작할 수 있다
+- draft API baseline이 정적 화면이 아닌 실제 앱 흐름으로 연결되어 Phase 5 초입의 사용자 경험이 보이기 시작했다
+- reorder, entry 제거, preview 전용 API/UI는 아직 후속 범위로 남아 있다
+
+### 다음 액션
+
+1. draft reorder API와 프론트 순서 변경 UI를 구현한다
+2. entry 제거 흐름을 추가해 초안 정리 baseline을 완성한다
+3. draft preview API와 실제 preview 화면 연결을 시작한다
+
+### 메모
+
+- 프론트 검증은 `pnpm --filter @book-maker/web lint`, `typecheck`, `test`, `build` 기준으로 확인한다
+- 현재 entry 추가 UI는 초안에 아직 담기지 않은 기록을 선택해 붙이는 baseline에 집중했다
+
+---
+
 ## 2026-03-26 (Draft API baseline)
 
 ### 완료
