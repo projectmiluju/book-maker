@@ -255,6 +255,51 @@ export class DraftsService {
     return this.findDraftById(userId, draftId);
   }
 
+  async reorderDraftEntries(
+    userId: string,
+    draftId: string,
+    entryIds: string[],
+  ): Promise<DraftDetailRecord> {
+    if (entryIds.length === 0) {
+      throw new BadRequestException('초안 순서를 바꾸려면 기록 순서가 필요합니다.');
+    }
+
+    await this.findDraftRecordById(userId, draftId);
+
+    const currentEntries = await this.listDraftEntries(draftId);
+    const currentEntryIds = currentEntries.map((draftEntry) => draftEntry.entry.id);
+
+    if (!hasSameEntrySet(currentEntryIds, entryIds)) {
+      throw new BadRequestException('초안에 담긴 기록 전체 순서를 그대로 보내야 합니다.');
+    }
+
+    let position = 0;
+
+    for (const entryId of entryIds) {
+      position += 1;
+
+      await this.databaseService.getPool().query(
+        `
+          UPDATE draft_entries
+          SET position = $3
+          WHERE draft_id = $1 AND entry_id = $2
+        `,
+        [draftId, entryId, position],
+      );
+    }
+
+    await this.databaseService.getPool().query(
+      `
+        UPDATE drafts
+        SET updated_at = NOW()
+        WHERE id = $1 AND user_id = $2
+      `,
+      [draftId, userId],
+    );
+
+    return this.findDraftById(userId, draftId);
+  }
+
   private async findDraftRecordById(userId: string, draftId: string): Promise<DraftRecord> {
     const result = await this.databaseService.getPool().query<DraftRow>(
       `
@@ -370,4 +415,18 @@ function normalizeOptionalText(value: string | undefined): string | null {
   const normalized = value.trim();
 
   return normalized.length > 0 ? normalized : null;
+}
+
+function hasSameEntrySet(currentEntryIds: string[], nextEntryIds: string[]) {
+  if (currentEntryIds.length !== nextEntryIds.length) {
+    return false;
+  }
+
+  const currentEntryIdSet = new Set(currentEntryIds);
+
+  if (currentEntryIdSet.size !== nextEntryIds.length) {
+    return false;
+  }
+
+  return nextEntryIds.every((entryId) => currentEntryIdSet.has(entryId));
 }

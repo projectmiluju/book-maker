@@ -30,3 +30,7 @@ export type CreateDraftInput = {
   description?: string;
   status?: DraftStatus;
 };
+
+export type ReorderDraftEntriesInput = {
+  entryIds: string[];
+};

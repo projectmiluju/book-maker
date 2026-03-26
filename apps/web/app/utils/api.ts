@@ -127,6 +127,18 @@ export function createDraftsApiClient(
         },
       );
     },
+    reorderDraftEntries(draftId: string, entryIds: string[]) {
+      return requestJson<PublicDraftDetail>(
+        fetcher,
+        baseUrl,
+        `/drafts/${draftId}/entries/reorder`,
+        {
+          method: 'PATCH',
+          body: { entryIds },
+          headers: createAuthHeaders(getAccessToken),
+        },
+      );
+    },
   };
 }
 

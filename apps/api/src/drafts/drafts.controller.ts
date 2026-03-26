@@ -15,6 +15,7 @@ import { toPublicDraft, toPublicDraftDetail } from './draft.types';
 import { DraftsService } from './drafts.service';
 import { AddDraftEntriesDto } from './dto/add-draft-entries.dto';
 import { CreateDraftDto } from './dto/create-draft.dto';
+import { ReorderDraftEntriesDto } from './dto/reorder-draft-entries.dto';
 import { UpdateDraftDto } from './dto/update-draft.dto';
 
 @Controller('drafts')
@@ -67,6 +68,21 @@ export class DraftsController {
     @Body() dto: AddDraftEntriesDto,
   ) {
     const draft = await this.draftsService.addEntriesToDraft(
+      user.userId,
+      draftId,
+      dto.entryIds,
+    );
+
+    return toPublicDraftDetail(draft);
+  }
+
+  @Patch(':draftId/entries/reorder')
+  async reorderDraftEntries(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('draftId') draftId: string,
+    @Body() dto: ReorderDraftEntriesDto,
+  ) {
+    const draft = await this.draftsService.reorderDraftEntries(
       user.userId,
       draftId,
       dto.entryIds,

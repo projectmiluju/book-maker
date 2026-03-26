@@ -165,6 +165,10 @@ class FakePool {
       return this.insertDraftEntry(values);
     }
 
+    if (normalizedQuery.startsWith('UPDATE draft_entries')) {
+      return this.updateDraftEntryPosition(values);
+    }
+
     if (
       normalizedQuery.includes('FROM entries WHERE user_id = $1 ORDER BY updated_at DESC')
     ) {
@@ -562,6 +566,27 @@ class FakePool {
     }
 
     draft.updatedAt = new Date();
+
+    return Promise.resolve({
+      rowCount: 1,
+    });
+  }
+
+  private updateDraftEntryPosition(values: unknown[]) {
+    const draftId = values[0] as string;
+    const entryId = values[1] as string;
+    const position = values[2] as number;
+    const draftEntry = [...this.draftEntriesById.values()].find(
+      (item) => item.draftId === draftId && item.entryId === entryId,
+    );
+
+    if (!draftEntry) {
+      return Promise.resolve({
+        rowCount: 0,
+      });
+    }
+
+    draftEntry.position = position;
 
     return Promise.resolve({
       rowCount: 1,
@@ -1023,6 +1048,29 @@ describe('AppController (e2e)', () => {
         entryIds: [firstEntry.id],
       })
       .expect(409);
+
+    const reorderResponse = await request(server)
+      .patch(`/api/drafts/${createdDraft.id}/entries/reorder`)
+      .set('Authorization', `Bearer ${auth.accessToken}`)
+      .send({
+        entryIds: [secondEntry.id, firstEntry.id],
+      })
+      .expect(200);
+    const reorderedDraft = reorderResponse.body as DraftDetailResponseBody;
+
+    expect(reorderedDraft.entries).toHaveLength(2);
+    expect(reorderedDraft.entries[0].position).toBe(1);
+    expect(reorderedDraft.entries[0].entry.id).toBe(secondEntry.id);
+    expect(reorderedDraft.entries[1].position).toBe(2);
+    expect(reorderedDraft.entries[1].entry.id).toBe(firstEntry.id);
+
+    await request(server)
+      .patch(`/api/drafts/${createdDraft.id}/entries/reorder`)
+      .set('Authorization', `Bearer ${auth.accessToken}`)
+      .send({
+        entryIds: [firstEntry.id],
+      })
+      .expect(400);
   });
 
   it('blocks access to another user draft and attached entries', async () => {
@@ -1073,6 +1121,14 @@ describe('AppController (e2e)', () => {
       .set('Authorization', `Bearer ${owner.accessToken}`)
       .send({
         entryIds: [strangerEntry.id],
+      })
+      .expect(404);
+
+    await request(server)
+      .patch(`/api/drafts/${ownerDraft.id}/entries/reorder`)
+      .set('Authorization', `Bearer ${stranger.accessToken}`)
+      .send({
+        entryIds: [ownerEntry.id],
       })
       .expect(404);
   });

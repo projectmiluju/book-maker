@@ -15,6 +15,7 @@ type DraftsApi = {
   getDraft(draftId: string): Promise<PublicDraftDetail>;
   createDraft(input: CreateDraftInput): Promise<PublicDraft>;
   addEntriesToDraft(draftId: string, entryIds: string[]): Promise<PublicDraftDetail>;
+  reorderDraftEntries(draftId: string, entryIds: string[]): Promise<PublicDraftDetail>;
 };
 
 type UseDraftsOptions = {
@@ -32,6 +33,8 @@ export function useDrafts(options: UseDraftsOptions) {
   const createError = ref('');
   const attachState = ref<DraftMutationState>('idle');
   const attachError = ref('');
+  const reorderState = ref<DraftMutationState>('idle');
+  const reorderError = ref('');
 
   async function loadDrafts() {
     listState.value = 'loading';
@@ -107,6 +110,26 @@ export function useDrafts(options: UseDraftsOptions) {
     }
   }
 
+  async function reorderDraftEntries(draftId: string, entryIds: string[]) {
+    reorderState.value = 'submitting';
+    reorderError.value = '';
+
+    try {
+      const draft = await options.api.reorderDraftEntries(draftId, entryIds);
+      currentDraft.value = draft;
+      syncDraft(draft);
+      reorderState.value = 'idle';
+
+      return draft;
+    } catch {
+      reorderState.value = 'error';
+      reorderError.value =
+        '초안 순서를 바꾸지 못했습니다. 잠시 후 다시 시도해 주세요.';
+
+      return null;
+    }
+  }
+
   function syncDraft(draft: PublicDraft) {
     const index = drafts.value.findIndex((item) => item.id === draft.id);
 
@@ -133,9 +156,12 @@ export function useDrafts(options: UseDraftsOptions) {
     createError,
     attachState,
     attachError,
+    reorderState,
+    reorderError,
     loadDrafts,
     loadDraftDetail,
     createDraft,
     addEntriesToDraft,
+    reorderDraftEntries,
   };
 }
