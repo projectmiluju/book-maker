@@ -12,6 +12,7 @@ import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 import request from 'supertest';
 
 import { AppModule } from './../src/app.module';
+import { DraftStatus } from './../src/drafts/draft.types';
 import { EntryStatus } from './../src/entries/entry.types';
 import { DatabaseService } from './../src/infrastructure/database/database.service';
 import { RedisService } from './../src/infrastructure/redis/redis.service';
@@ -85,6 +86,43 @@ type EntryResponseBody = {
   lastSavedAt: string;
 };
 
+type DraftResponseBody = {
+  id: string;
+  title: string;
+  description: string | null;
+  status: DraftStatus;
+  entryCount: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type DraftDetailResponseBody = DraftResponseBody & {
+  entries: Array<{
+    id: string;
+    position: number;
+    createdAt: string;
+    entry: EntryResponseBody;
+  }>;
+};
+
+type StoredDraft = {
+  id: string;
+  userId: string;
+  title: string;
+  description: string | null;
+  status: DraftStatus;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+type StoredDraftEntry = {
+  id: string;
+  draftId: string;
+  entryId: string;
+  position: number;
+  createdAt: Date;
+};
+
 class DuplicateEmailError extends Error {
   code = '23505' as const;
 
@@ -97,6 +135,8 @@ class FakePool {
   private readonly usersById = new Map<string, StoredUser>();
   private readonly usersByEmail = new Map<string, StoredUser>();
   private readonly entriesById = new Map<string, StoredEntry>();
+  private readonly draftsById = new Map<string, StoredDraft>();
+  private readonly draftEntriesById = new Map<string, StoredDraftEntry>();
 
   query<T>(queryText: string, values: unknown[]) {
     const normalizedQuery = queryText.replace(/\s+/g, ' ').trim();
@@ -117,10 +157,61 @@ class FakePool {
       return this.insertEntry<T>(values);
     }
 
+    if (normalizedQuery.startsWith('INSERT INTO drafts')) {
+      return this.insertDraft<T>(values);
+    }
+
+    if (normalizedQuery.startsWith('INSERT INTO draft_entries')) {
+      return this.insertDraftEntry(values);
+    }
+
     if (
       normalizedQuery.includes('FROM entries WHERE user_id = $1 ORDER BY updated_at DESC')
     ) {
       return this.listEntries<T>(values);
+    }
+
+    if (
+      normalizedQuery.includes('FROM drafts d LEFT JOIN draft_entries de ON de.draft_id = d.id') &&
+      normalizedQuery.includes('WHERE d.user_id = $1') &&
+      normalizedQuery.includes('ORDER BY d.updated_at DESC')
+    ) {
+      return this.listDrafts<T>(values);
+    }
+
+    if (
+      normalizedQuery.includes('FROM drafts d LEFT JOIN draft_entries de ON de.draft_id = d.id') &&
+      normalizedQuery.includes('WHERE d.id = $1 AND d.user_id = $2')
+    ) {
+      return this.selectDraftById<T>(values);
+    }
+
+    if (
+      normalizedQuery.includes('FROM draft_entries de INNER JOIN entries e ON e.id = de.entry_id')
+    ) {
+      return this.listDraftEntries<T>(values);
+    }
+
+    if (
+      normalizedQuery.includes('FROM entries WHERE user_id = $1 AND id = ANY($2::uuid[])')
+    ) {
+      return this.selectEntriesByIds<T>(values);
+    }
+
+    if (
+      normalizedQuery.includes(
+        'FROM draft_entries WHERE draft_id = $1 AND entry_id = ANY($2::uuid[])',
+      )
+    ) {
+      return this.selectDraftEntriesByEntryIds<T>(values);
+    }
+
+    if (normalizedQuery.includes('SELECT COALESCE(MAX(position), 0) AS "maxPosition"')) {
+      return this.selectDraftMaxPosition<T>(values);
+    }
+
+    if (normalizedQuery.includes('SELECT COUNT(*)::int AS "maxPosition"')) {
+      return this.countDraftEntries<T>(values);
     }
 
     if (normalizedQuery.startsWith('DELETE FROM entries')) {
@@ -133,6 +224,20 @@ class FakePool {
 
     if (normalizedQuery.startsWith('UPDATE entries')) {
       return this.updateEntry<T>(values);
+    }
+
+    if (
+      normalizedQuery.startsWith('UPDATE drafts') &&
+      normalizedQuery.includes('RETURNING')
+    ) {
+      return this.updateDraft<T>(values);
+    }
+
+    if (
+      normalizedQuery.startsWith('UPDATE drafts') &&
+      !normalizedQuery.includes('RETURNING')
+    ) {
+      return this.touchDraft(values);
     }
 
     return Promise.reject(new Error(`Unsupported fake query: ${normalizedQuery}`));
@@ -200,6 +305,45 @@ class FakePool {
     });
   }
 
+  private insertDraft<T>(values: unknown[]) {
+    const now = new Date();
+    const draft: StoredDraft = {
+      id: randomUUID(),
+      userId: values[0] as string,
+      title: values[1] as string,
+      description: (values[2] as string | null) ?? null,
+      status: values[3] as DraftStatus,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    this.draftsById.set(draft.id, draft);
+
+    return Promise.resolve({
+      rows: [this.toDraftRow(draft, 0)] as T[],
+    });
+  }
+
+  private insertDraftEntry(values: unknown[]) {
+    const draftId = values[0] as string;
+    const entryId = values[1] as string;
+    const position = values[2] as number;
+    const draftEntry: StoredDraftEntry = {
+      id: randomUUID(),
+      draftId,
+      entryId,
+      position,
+      createdAt: new Date(),
+    };
+
+    this.draftEntriesById.set(draftEntry.id, draftEntry);
+
+    return Promise.resolve({
+      rowCount: 1,
+      rows: [],
+    });
+  }
+
   private listEntries<T>(values: unknown[]) {
     const userId = values[0] as string;
     const entries = [...this.entriesById.values()]
@@ -209,6 +353,34 @@ class FakePool {
 
     return Promise.resolve({
       rows: entries,
+    });
+  }
+
+  private listDrafts<T>(values: unknown[]) {
+    const userId = values[0] as string;
+    const drafts = [...this.draftsById.values()]
+      .filter((draft) => draft.userId === userId)
+      .sort((left, right) => right.updatedAt.getTime() - left.updatedAt.getTime())
+      .map((draft) => this.toDraftRow(draft, this.getDraftEntryCount(draft.id))) as T[];
+
+    return Promise.resolve({
+      rows: drafts,
+    });
+  }
+
+  private selectDraftById<T>(values: unknown[]) {
+    const draftId = values[0] as string;
+    const userId = values[1] as string;
+    const draft = this.draftsById.get(draftId);
+
+    if (!draft || draft.userId !== userId) {
+      return Promise.resolve({
+        rows: [] as T[],
+      });
+    }
+
+    return Promise.resolve({
+      rows: [this.toDraftRow(draft, this.getDraftEntryCount(draft.id))] as T[],
     });
   }
 
@@ -225,6 +397,82 @@ class FakePool {
 
     return Promise.resolve({
       rows: [this.toEntryRow(entry)] as T[],
+    });
+  }
+
+  private listDraftEntries<T>(values: unknown[]) {
+    const draftId = values[0] as string;
+    const rows = [...this.draftEntriesById.values()]
+      .filter((draftEntry) => draftEntry.draftId === draftId)
+      .sort((left, right) => left.position - right.position)
+      .map((draftEntry) => {
+        const entry = this.entriesById.get(draftEntry.entryId);
+
+        if (!entry) {
+          throw new Error(`Missing entry for draft entry ${draftEntry.id}`);
+        }
+
+        return {
+          id: draftEntry.id,
+          position: draftEntry.position,
+          createdAt: draftEntry.createdAt,
+          entryId: entry.id,
+          entryUserId: entry.userId,
+          entryTitle: entry.title,
+          entryBody: entry.body,
+          entryStatus: entry.status,
+          entryCreatedAt: entry.createdAt,
+          entryUpdatedAt: entry.updatedAt,
+          entryLastSavedAt: entry.lastSavedAt,
+        };
+      }) as T[];
+
+    return Promise.resolve({
+      rows,
+    });
+  }
+
+  private selectEntriesByIds<T>(values: unknown[]) {
+    const userId = values[0] as string;
+    const entryIds = values[1] as string[];
+    const rows = entryIds
+      .map((entryId) => this.entriesById.get(entryId))
+      .filter((entry): entry is StoredEntry => Boolean(entry && entry.userId === userId))
+      .map((entry) => ({ id: entry.id })) as T[];
+
+    return Promise.resolve({
+      rows,
+    });
+  }
+
+  private selectDraftEntriesByEntryIds<T>(values: unknown[]) {
+    const draftId = values[0] as string;
+    const entryIds = new Set(values[1] as string[]);
+    const rows = [...this.draftEntriesById.values()]
+      .filter((draftEntry) => draftEntry.draftId === draftId && entryIds.has(draftEntry.entryId))
+      .map((draftEntry) => ({ entryId: draftEntry.entryId })) as T[];
+
+    return Promise.resolve({
+      rows,
+    });
+  }
+
+  private selectDraftMaxPosition<T>(values: unknown[]) {
+    const draftId = values[0] as string;
+    const maxPosition = [...this.draftEntriesById.values()]
+      .filter((draftEntry) => draftEntry.draftId === draftId)
+      .reduce((currentMax, draftEntry) => Math.max(currentMax, draftEntry.position), 0);
+
+    return Promise.resolve({
+      rows: [{ maxPosition }] as T[],
+    });
+  }
+
+  private countDraftEntries<T>(values: unknown[]) {
+    const draftId = values[0] as string;
+
+    return Promise.resolve({
+      rows: [{ maxPosition: this.getDraftEntryCount(draftId) }] as T[],
     });
   }
 
@@ -263,6 +511,60 @@ class FakePool {
 
     return Promise.resolve({
       rows: [this.toEntryRow(entry)] as T[],
+    });
+  }
+
+  private updateDraft<T>(values: unknown[]) {
+    const draftId = values[0] as string;
+    const userId = values[1] as string;
+    const updateTitle = values[2] as boolean;
+    const title = values[3] as string | null;
+    const updateDescription = values[4] as boolean;
+    const description = values[5] as string | null;
+    const updateStatus = values[6] as boolean;
+    const status = values[7] as DraftStatus | null;
+    const draft = this.draftsById.get(draftId);
+
+    if (!draft || draft.userId !== userId) {
+      return Promise.resolve({
+        rows: [] as T[],
+      });
+    }
+
+    if (updateTitle && title !== null) {
+      draft.title = title;
+    }
+
+    if (updateDescription) {
+      draft.description = description;
+    }
+
+    if (updateStatus && status !== null) {
+      draft.status = status;
+    }
+
+    draft.updatedAt = new Date();
+
+    return Promise.resolve({
+      rows: [this.toDraftRow(draft, this.getDraftEntryCount(draft.id))] as T[],
+    });
+  }
+
+  private touchDraft(values: unknown[]) {
+    const draftId = values[0] as string;
+    const userId = values[1] as string;
+    const draft = this.draftsById.get(draftId);
+
+    if (!draft || draft.userId !== userId) {
+      return Promise.resolve({
+        rowCount: 0,
+      });
+    }
+
+    draft.updatedAt = new Date();
+
+    return Promise.resolve({
+      rowCount: 1,
     });
   }
 
@@ -306,6 +608,25 @@ class FakePool {
       updatedAt: entry.updatedAt,
       lastSavedAt: entry.lastSavedAt,
     };
+  }
+
+  private toDraftRow(draft: StoredDraft, entryCount: number) {
+    return {
+      id: draft.id,
+      userId: draft.userId,
+      title: draft.title,
+      description: draft.description,
+      status: draft.status,
+      createdAt: draft.createdAt,
+      updatedAt: draft.updatedAt,
+      entryCount,
+    };
+  }
+
+  private getDraftEntryCount(draftId: string) {
+    return [...this.draftEntriesById.values()].filter(
+      (draftEntry) => draftEntry.draftId === draftId,
+    ).length;
   }
 }
 
@@ -620,6 +941,141 @@ describe('AppController (e2e)', () => {
       .set('Authorization', `Bearer ${stranger.accessToken}`)
       .expect(404);
   });
+
+  it('creates, lists, reads, updates, and adds entries to a draft inside the current user scope', async () => {
+    const server = app.getHttpServer();
+    const auth = await signup(server, 'draft-owner@example.com');
+
+    const firstEntry = await createEntry(server, auth.accessToken, {
+      title: '첫 기록',
+      body: '첫 문장',
+    });
+    const secondEntry = await createEntry(server, auth.accessToken, {
+      title: '둘째 기록',
+      body: '둘째 문장',
+    });
+
+    const createDraftResponse = await request(server)
+      .post('/api/drafts')
+      .set('Authorization', `Bearer ${auth.accessToken}`)
+      .send({
+        title: '  파도 초안  ',
+        description: '  바다를 모은다  ',
+      })
+      .expect(201);
+    const createdDraft = createDraftResponse.body as DraftResponseBody;
+
+    expect(createdDraft.title).toBe('파도 초안');
+    expect(createdDraft.description).toBe('바다를 모은다');
+    expect(createdDraft.entryCount).toBe(0);
+    expect(createdDraft.status).toBe('active');
+
+    const listResponse = await request(server)
+      .get('/api/drafts')
+      .set('Authorization', `Bearer ${auth.accessToken}`)
+      .expect(200);
+    const listBody = listResponse.body as DraftResponseBody[];
+
+    expect(listBody).toHaveLength(1);
+    expect(listBody[0].id).toBe(createdDraft.id);
+
+    const updateResponse = await request(server)
+      .patch(`/api/drafts/${createdDraft.id}`)
+      .set('Authorization', `Bearer ${auth.accessToken}`)
+      .send({
+        title: '고요한 파도',
+        description: '',
+        status: 'archived',
+      })
+      .expect(200);
+    const updatedDraft = updateResponse.body as DraftResponseBody;
+
+    expect(updatedDraft.title).toBe('고요한 파도');
+    expect(updatedDraft.description).toBeNull();
+    expect(updatedDraft.status).toBe('archived');
+
+    const attachResponse = await request(server)
+      .post(`/api/drafts/${createdDraft.id}/entries`)
+      .set('Authorization', `Bearer ${auth.accessToken}`)
+      .send({
+        entryIds: [firstEntry.id, secondEntry.id],
+      })
+      .expect(201);
+    const attachedDraft = attachResponse.body as DraftDetailResponseBody;
+
+    expect(attachedDraft.entryCount).toBe(2);
+    expect(attachedDraft.entries).toHaveLength(2);
+    expect(attachedDraft.entries[0].position).toBe(1);
+    expect(attachedDraft.entries[0].entry.id).toBe(firstEntry.id);
+    expect(attachedDraft.entries[1].position).toBe(2);
+    expect(attachedDraft.entries[1].entry.id).toBe(secondEntry.id);
+
+    await request(server)
+      .get(`/api/drafts/${createdDraft.id}`)
+      .set('Authorization', `Bearer ${auth.accessToken}`)
+      .expect(200)
+      .expect(attachedDraft);
+
+    await request(server)
+      .post(`/api/drafts/${createdDraft.id}/entries`)
+      .set('Authorization', `Bearer ${auth.accessToken}`)
+      .send({
+        entryIds: [firstEntry.id],
+      })
+      .expect(409);
+  });
+
+  it('blocks access to another user draft and attached entries', async () => {
+    const server = app.getHttpServer();
+    const owner = await signup(server, 'draft-owner-2@example.com');
+    const stranger = await signup(server, 'draft-other@example.com');
+
+    const ownerEntry = await createEntry(server, owner.accessToken, {
+      body: 'owner entry',
+    });
+
+    const createDraftResponse = await request(server)
+      .post('/api/drafts')
+      .set('Authorization', `Bearer ${owner.accessToken}`)
+      .send({
+        title: 'owner draft',
+      })
+      .expect(201);
+    const ownerDraft = createDraftResponse.body as DraftResponseBody;
+
+    await request(server)
+      .get(`/api/drafts/${ownerDraft.id}`)
+      .set('Authorization', `Bearer ${stranger.accessToken}`)
+      .expect(404);
+
+    await request(server)
+      .patch(`/api/drafts/${ownerDraft.id}`)
+      .set('Authorization', `Bearer ${stranger.accessToken}`)
+      .send({
+        title: 'stolen',
+      })
+      .expect(404);
+
+    await request(server)
+      .post(`/api/drafts/${ownerDraft.id}/entries`)
+      .set('Authorization', `Bearer ${stranger.accessToken}`)
+      .send({
+        entryIds: [ownerEntry.id],
+      })
+      .expect(404);
+
+    const strangerEntry = await createEntry(server, stranger.accessToken, {
+      body: 'stranger entry',
+    });
+
+    await request(server)
+      .post(`/api/drafts/${ownerDraft.id}/entries`)
+      .set('Authorization', `Bearer ${owner.accessToken}`)
+      .send({
+        entryIds: [strangerEntry.id],
+      })
+      .expect(404);
+  });
 });
 
 async function signup(server: ReturnType<INestApplication['getHttpServer']>, email: string) {
@@ -633,4 +1089,21 @@ async function signup(server: ReturnType<INestApplication['getHttpServer']>, ema
     .expect(201);
 
   return response.body as AuthResponseBody;
+}
+
+async function createEntry(
+  server: ReturnType<INestApplication['getHttpServer']>,
+  accessToken: string,
+  payload: {
+    title?: string;
+    body: string;
+  },
+) {
+  const response = await request(server)
+    .post('/api/entries')
+    .set('Authorization', `Bearer ${accessToken}`)
+    .send(payload)
+    .expect(201);
+
+  return response.body as EntryResponseBody;
 }

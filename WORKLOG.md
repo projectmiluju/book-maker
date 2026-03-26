@@ -10,6 +10,36 @@
 
 ---
 
+## 2026-03-26 (Draft API baseline)
+
+### 완료
+
+- 이슈 `#23` 기준 `apps/api` 초안 도메인 baseline 추가
+- PostgreSQL migration `0003_create_drafts.sql`로 `drafts`, `draft_entries` 테이블 및 인덱스 추가
+- `POST /drafts`, `GET /drafts`, `GET /drafts/:id`, `PATCH /drafts/:id`, `POST /drafts/:id/entries` 구현
+- 초안 목록 응답에 `entryCount`를 포함하고 상세 응답에 ordered draft entries 구조 추가
+- draft ownership, 존재하지 않는 리소스, 동일 초안 내 중복 entry 첨부 방지 로직 추가
+- Drafts 서비스 단위 테스트와 fake PostgreSQL / Redis 기반 e2e 테스트 보강
+
+### 현재 상태
+
+- 인증된 사용자는 자신의 초안을 생성, 조회, 수정하고 기록을 초안에 순서대로 담기 시작할 수 있다
+- 초안 상세 응답이 이후 프론트 draft 화면이 바로 사용할 수 있는 baseline 계약을 제공한다
+- reorder, entry 제거, preview 전용 계약은 아직 구현되지 않았고 후속 이슈 범위로 남아 있다
+
+### 다음 액션
+
+1. `apps/web` draft list / detail 화면을 실제 draft API에 연결한다
+2. draft entry reorder API와 제거 API를 추가해 초안 정리 흐름을 완성한다
+3. draft preview API와 프론트 preview 화면 연결을 시작한다
+
+### 메모
+
+- 백엔드 검증은 `pnpm --filter @book-maker/api lint`, `typecheck`, `test`, `test:e2e` 기준으로 확인한다
+- 초안 baseline 리스크는 ownership, 존재하지 않는 entry 첨부, 중복 첨부 경계를 서비스/e2e 테스트로 먼저 고정했다
+
+---
+
 ## 2026-03-25 (Archive list / detail integration)
 
 ### 완료
