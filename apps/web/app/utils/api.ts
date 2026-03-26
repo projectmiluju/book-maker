@@ -1,4 +1,9 @@
 import type { StoredAuthSession } from '../types/auth';
+import type {
+  CreateDraftInput,
+  PublicDraft,
+  PublicDraftDetail,
+} from '../types/drafts';
 import type { EntryInput, PublicEntry } from '../types/entries';
 
 type AuthCredentials = {
@@ -83,6 +88,44 @@ export function createEntriesApiClient(
         body: input,
         headers: createAuthHeaders(getAccessToken),
       });
+    },
+  };
+}
+
+export function createDraftsApiClient(
+  baseUrl: string,
+  getAccessToken: () => string | null,
+  fetcher: Fetcher = globalThis.fetch,
+) {
+  return {
+    listDrafts() {
+      return requestJson<PublicDraft[]>(fetcher, baseUrl, '/drafts', {
+        headers: createAuthHeaders(getAccessToken),
+      });
+    },
+    getDraft(draftId: string) {
+      return requestJson<PublicDraftDetail>(fetcher, baseUrl, `/drafts/${draftId}`, {
+        headers: createAuthHeaders(getAccessToken),
+      });
+    },
+    createDraft(input: CreateDraftInput) {
+      return requestJson<PublicDraft>(fetcher, baseUrl, '/drafts', {
+        method: 'POST',
+        body: input,
+        headers: createAuthHeaders(getAccessToken),
+      });
+    },
+    addEntriesToDraft(draftId: string, entryIds: string[]) {
+      return requestJson<PublicDraftDetail>(
+        fetcher,
+        baseUrl,
+        `/drafts/${draftId}/entries`,
+        {
+          method: 'POST',
+          body: { entryIds },
+          headers: createAuthHeaders(getAccessToken),
+        },
+      );
     },
   };
 }
