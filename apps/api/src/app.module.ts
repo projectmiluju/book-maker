@@ -7,6 +7,7 @@ import { authConfig } from './config/auth.config';
 import { databaseConfig } from './config/database.config';
 import { validateEnvironment } from './config/env.validation';
 import { redisConfig } from './config/redis.config';
+import { DraftsModule } from './drafts/drafts.module';
 import { EntriesModule } from './entries/entries.module';
 import { HealthModule } from './health/health.module';
 import { InfrastructureModule } from './infrastructure/infrastructure.module';
@@ -23,6 +24,7 @@ import { UsersModule } from './users/users.module';
     UsersModule,
     AuthModule,
     EntriesModule,
+    DraftsModule,
     HealthModule,
   ],
 })
