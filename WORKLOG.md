@@ -10,6 +10,34 @@
 
 ---
 
+## 2026-03-26 (Draft reorder flow)
+
+### 완료
+
+- 이슈 `#27` 기준 `apps/api`에 `PATCH /drafts/:id/entries/reorder` 계약과 순서 재정렬 로직 추가
+- 초안 상세 화면에서 위/아래 이동 버튼으로 기록 순서를 바꾸는 reorder UI 연결
+- `useDrafts`에 reorder mutation 상태와 오류 메시지를 추가하고 초안 detail/list 동기화 유지
+- Drafts 서비스 테스트, fake PostgreSQL/Redis e2e, 프론트 composable 테스트에 reorder 시나리오 보강
+
+### 현재 상태
+
+- 사용자는 초안 상세 화면에서 담아둔 기록의 순서를 실제로 바꿀 수 있다
+- draft organization MVP 범위 중 reorder가 API와 프론트 양쪽에서 연결되었다
+- entry 제거와 preview 전용 API/UI는 아직 후속 범위로 남아 있다
+
+### 다음 액션
+
+1. entry 제거 흐름을 추가해 초안 정리 baseline을 완성한다
+2. draft preview API와 실제 preview 화면 연결을 시작한다
+3. draft detail에서 reorder와 remove를 함께 다루는 정리 UX를 다듬는다
+
+### 메모
+
+- reorder는 초안에 담긴 전체 entry id 집합을 그대로 보내는 계약으로 구현해 순서 무결성을 우선 보호했다
+- 검증은 `apps/api`, `apps/web`의 lint/typecheck/test/build 중심으로 확인한다
+
+---
+
 ## 2026-03-26 (Draft web integration)
 
 ### 완료

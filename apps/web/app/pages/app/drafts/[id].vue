@@ -43,6 +43,9 @@ const {
   detailError,
   detailState,
   loadDraftDetail,
+  reorderDraftEntries,
+  reorderError,
+  reorderState,
 } = draftsStore;
 
 const draftId = computed(() => String(route.params.id));
@@ -124,6 +127,46 @@ function toggleEntrySelection(entryId: string, selected: boolean) {
 
 function buildOrderLabel(position: number) {
   return String(position).padStart(2, '0');
+}
+
+function canMoveEntry(index: number, direction: 'up' | 'down') {
+  if (!currentDraft.value || reorderState.value === 'submitting') {
+    return false;
+  }
+
+  return direction === 'up'
+    ? index > 0
+    : index < currentDraft.value.entries.length - 1;
+}
+
+async function moveDraftEntry(entryId: string, direction: 'up' | 'down') {
+  if (!currentDraft.value) {
+    return;
+  }
+
+  const currentEntryIds = currentDraft.value.entries.map((item) => item.entry.id);
+  const currentIndex = currentEntryIds.indexOf(entryId);
+
+  if (currentIndex === -1) {
+    return;
+  }
+
+  const nextIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+
+  if (nextIndex < 0 || nextIndex >= currentEntryIds.length) {
+    return;
+  }
+
+  const nextEntryIds = [...currentEntryIds];
+  const [movedEntryId] = nextEntryIds.splice(currentIndex, 1);
+
+  if (!movedEntryId) {
+    return;
+  }
+
+  nextEntryIds.splice(nextIndex, 0, movedEntryId);
+
+  await reorderDraftEntries(draftId.value, nextEntryIds);
 }
 
 async function loadDraftResources(nextDraftId: string) {
@@ -311,6 +354,10 @@ function handleEntrySelectionChange(entryId: string, event: Event) {
         <section>
           <div class="sequence-header">초안에 담긴 기록</div>
 
+          <p v-if="reorderState === 'error'" class="writer-alert writer-alert-error">
+            {{ reorderError }}
+          </p>
+
           <div v-if="currentDraft.entries.length === 0" class="archive-state-card">
             <p class="archive-state-copy">
               아직 이 초안에는 담긴 기록이 없습니다. 위에서 기록을 골라 첫 흐름을 만들어 보세요.
@@ -319,7 +366,7 @@ function handleEntrySelectionChange(entryId: string, event: Event) {
 
           <div v-else class="sequence-list">
             <article
-              v-for="draftEntry in currentDraft.entries"
+              v-for="(draftEntry, index) in currentDraft.entries"
               :key="draftEntry.id"
               class="sequence-item"
             >
@@ -330,8 +377,28 @@ function handleEntrySelectionChange(entryId: string, event: Event) {
                 </h2>
                 <p class="sequence-copy">{{ buildEntryPreview(draftEntry.entry.body) }}</p>
               </div>
-              <div class="sequence-tag">
-                {{ formatEntryDate(draftEntry.entry.updatedAt) }}
+              <div class="sequence-tools">
+                <div class="sequence-tag">
+                  {{ formatEntryDate(draftEntry.entry.updatedAt) }}
+                </div>
+                <div class="sequence-actions">
+                  <button
+                    class="button-ghost sequence-action"
+                    type="button"
+                    :disabled="!canMoveEntry(index, 'up')"
+                    @click="moveDraftEntry(draftEntry.entry.id, 'up')"
+                  >
+                    위로
+                  </button>
+                  <button
+                    class="button-ghost sequence-action"
+                    type="button"
+                    :disabled="!canMoveEntry(index, 'down')"
+                    @click="moveDraftEntry(draftEntry.entry.id, 'down')"
+                  >
+                    아래로
+                  </button>
+                </div>
               </div>
             </article>
           </div>

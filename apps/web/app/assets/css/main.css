@@ -970,6 +970,23 @@ textarea {
   white-space: nowrap;
 }
 
+.sequence-tools {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.sequence-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.sequence-action {
+  min-width: 72px;
+  padding: 8px 12px;
+}
+
 .draft-footer {
   max-width: 680px;
   margin-top: 32px;
