@@ -38,6 +38,33 @@
 
 ---
 
+## 2026-03-27 (Auth expiry smoke e2e)
+
+### 완료
+
+- 이슈 `#38` 기준 Playwright auth helper를 추가해 write 화면 회원가입과 local storage session 조작을 재사용 가능하게 정리
+- access token이 더 이상 유효하지 않을 때 autosave 요청이 401 이후 세션을 정리하고 로그인 화면으로 복귀하는 smoke 시나리오를 추가
+- 인증 만료 시 저장 요청이 무한 반복되지 않고 한 번만 발생하는지 브라우저 수준에서 함께 확인
+
+### 현재 상태
+
+- 핵심 루프 smoke 외에 인증 세션 단절 리스크도 브라우저 E2E로 회귀 보호 범위에 들어왔다
+- 현재 auth 구조는 silent refresh보다 세션 정리/로그인 재진입 흐름을 우선 검증하는 상태다
+- 남은 후속 작업은 CI에서 이 시나리오 실행 시간과 flaky 포인트를 관찰하며 필요한 범위만 다듬는 쪽이다
+
+### 다음 액션
+
+1. GitHub Actions에서 auth-expiry smoke까지 포함한 Playwright 실행 시간을 보고 retry나 step 분리를 필요한 수준만 검토한다
+2. auth/session 구조가 실제 refresh 흐름까지 확장되면 별도 smoke로 silent refresh 성공/실패 분기를 나눈다
+3. 고위험 회귀 구간은 현재처럼 최소 시나리오 중심으로만 점진 확장한다
+
+### 메모
+
+- 검증은 `pnpm --filter @book-maker/web lint`, `typecheck`, `pnpm test:web:e2e` 기준으로 확인한다
+- 이번 smoke는 현재 구현과 맞춰 `refresh 복구`가 아니라 `세션 정리 후 로그인 재진입` 흐름을 보호한다
+
+---
+
 ## 2026-03-27 (Playwright smoke e2e baseline)
 
 ### 완료
