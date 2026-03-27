@@ -1,7 +1,16 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const apiBaseUrl = 'http://127.0.0.1:4000';
-const webBaseUrl = 'http://127.0.0.1:3000';
+const apiPort = process.env.API_PORT ?? (process.env.CI ? '4100' : '4000');
+const webPort = process.env.NUXT_PORT ?? (process.env.CI ? '3100' : '3000');
+const apiBaseUrl = `http://127.0.0.1:${apiPort}`;
+const webBaseUrl = `http://127.0.0.1:${webPort}`;
+const apiServerCommand = [
+  'pnpm --dir ../.. db:migrate:api',
+  'pnpm --dir ../.. --filter @book-maker/api start',
+].join(' && ');
+const webServerCommand = process.env.CI
+  ? `pnpm exec nuxt preview --port ${webPort}`
+  : `pnpm exec nuxt dev --host 127.0.0.1 --port ${webPort}`;
 
 export default defineConfig({
   testDir: './e2e',
@@ -22,15 +31,15 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command:
-        'pnpm --dir ../.. db:migrate:api && pnpm --dir ../.. --filter @book-maker/api start:dev',
+      command: apiServerCommand,
       url: `${apiBaseUrl}/api/health`,
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,
       env: {
         NODE_ENV: 'development',
-        API_PORT: '4000',
+        API_PORT: apiPort,
         API_PREFIX: 'api',
+        NUXT_PORT: webPort,
         POSTGRES_HOST: process.env.POSTGRES_HOST ?? '127.0.0.1',
         POSTGRES_PORT: process.env.POSTGRES_PORT ?? '5432',
         POSTGRES_DB: process.env.POSTGRES_DB ?? 'book_maker',
@@ -54,7 +63,7 @@ export default defineConfig({
       },
     },
     {
-      command: 'pnpm dev --host 127.0.0.1 --port 3000',
+      command: webServerCommand,
       url: webBaseUrl,
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,
