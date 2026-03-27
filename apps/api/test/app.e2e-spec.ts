@@ -165,6 +165,10 @@ class FakePool {
       return this.insertDraftEntry(values);
     }
 
+    if (normalizedQuery.startsWith('DELETE FROM draft_entries')) {
+      return this.deleteDraftEntry(values);
+    }
+
     if (normalizedQuery.startsWith('UPDATE draft_entries')) {
       return this.updateDraftEntryPosition(values);
     }
@@ -587,6 +591,26 @@ class FakePool {
     }
 
     draftEntry.position = position;
+
+    return Promise.resolve({
+      rowCount: 1,
+    });
+  }
+
+  private deleteDraftEntry(values: unknown[]) {
+    const draftId = values[0] as string;
+    const entryId = values[1] as string;
+    const draftEntry = [...this.draftEntriesById.values()].find(
+      (item) => item.draftId === draftId && item.entryId === entryId,
+    );
+
+    if (!draftEntry) {
+      return Promise.resolve({
+        rowCount: 0,
+      });
+    }
+
+    this.draftEntriesById.delete(draftEntry.id);
 
     return Promise.resolve({
       rowCount: 1,
@@ -1064,11 +1088,27 @@ describe('AppController (e2e)', () => {
     expect(reorderedDraft.entries[1].position).toBe(2);
     expect(reorderedDraft.entries[1].entry.id).toBe(firstEntry.id);
 
+    const removedDraftResponse = await request(server)
+      .delete(`/api/drafts/${createdDraft.id}/entries/${secondEntry.id}`)
+      .set('Authorization', `Bearer ${auth.accessToken}`)
+      .expect(200);
+    const removedDraft = removedDraftResponse.body as DraftDetailResponseBody;
+
+    expect(removedDraft.entryCount).toBe(1);
+    expect(removedDraft.entries).toHaveLength(1);
+    expect(removedDraft.entries[0].position).toBe(1);
+    expect(removedDraft.entries[0].entry.id).toBe(firstEntry.id);
+
+    await request(server)
+      .delete(`/api/drafts/${createdDraft.id}/entries/${secondEntry.id}`)
+      .set('Authorization', `Bearer ${auth.accessToken}`)
+      .expect(404);
+
     await request(server)
       .patch(`/api/drafts/${createdDraft.id}/entries/reorder`)
       .set('Authorization', `Bearer ${auth.accessToken}`)
       .send({
-        entryIds: [firstEntry.id],
+        entryIds: [],
       })
       .expect(400);
   });
@@ -1130,6 +1170,11 @@ describe('AppController (e2e)', () => {
       .send({
         entryIds: [ownerEntry.id],
       })
+      .expect(404);
+
+    await request(server)
+      .delete(`/api/drafts/${ownerDraft.id}/entries/${ownerEntry.id}`)
+      .set('Authorization', `Bearer ${stranger.accessToken}`)
       .expect(404);
   });
 });

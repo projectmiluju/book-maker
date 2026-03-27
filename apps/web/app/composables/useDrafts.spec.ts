@@ -60,6 +60,7 @@ describe('useDrafts', () => {
         getDraft: vi.fn(),
         createDraft: vi.fn(),
         addEntriesToDraft: vi.fn(),
+        removeDraftEntry: vi.fn(),
         reorderDraftEntries: vi.fn(),
       },
     });
@@ -77,6 +78,7 @@ describe('useDrafts', () => {
         getDraft: vi.fn(),
         createDraft: vi.fn(),
         addEntriesToDraft: vi.fn(),
+        removeDraftEntry: vi.fn(),
         reorderDraftEntries: vi.fn(),
       },
     });
@@ -97,6 +99,7 @@ describe('useDrafts', () => {
         getDraft: vi.fn(),
         createDraft,
         addEntriesToDraft: vi.fn(),
+        removeDraftEntry: vi.fn(),
         reorderDraftEntries: vi.fn(),
       },
     });
@@ -117,6 +120,7 @@ describe('useDrafts', () => {
         getDraft: vi.fn().mockResolvedValue(createDraftDetailFixture()),
         createDraft: vi.fn(),
         addEntriesToDraft: vi.fn(),
+        removeDraftEntry: vi.fn(),
         reorderDraftEntries: vi.fn(),
       },
     });
@@ -135,6 +139,7 @@ describe('useDrafts', () => {
         getDraft: vi.fn().mockResolvedValue(createDraftDetailFixture()),
         createDraft: vi.fn(),
         addEntriesToDraft: vi.fn().mockRejectedValue(new Error('boom')),
+        removeDraftEntry: vi.fn(),
         reorderDraftEntries: vi.fn(),
       },
     });
@@ -145,6 +150,82 @@ describe('useDrafts', () => {
     expect(drafts.attachError.value).toContain('초안에 담지 못했습니다');
   });
 
+  it('removes a draft entry and syncs the current draft detail', async () => {
+    const drafts = useDrafts({
+      api: {
+        listDrafts: vi.fn().mockResolvedValue([]),
+        getDraft: vi.fn().mockResolvedValue(
+          createDraftDetailFixture({
+            entryCount: 2,
+            entries: [
+              {
+                id: 'draft-entry-1',
+                position: 1,
+                createdAt: '2026-03-26T00:00:00.000Z',
+                entry: {
+                  id: 'entry-1',
+                  title: '창가에 남은 빛',
+                  body: '저녁빛이 식탁 위를 천천히 지나가던 순간.',
+                  status: 'draft',
+                  createdAt: '2026-03-25T00:00:00.000Z',
+                  updatedAt: '2026-03-25T00:00:00.000Z',
+                  lastSavedAt: '2026-03-25T00:00:00.000Z',
+                },
+              },
+              {
+                id: 'draft-entry-2',
+                position: 2,
+                createdAt: '2026-03-26T00:00:00.000Z',
+                entry: {
+                  id: 'entry-2',
+                  title: '둘째 기록',
+                  body: '둘째 문장',
+                  status: 'draft',
+                  createdAt: '2026-03-25T00:00:00.000Z',
+                  updatedAt: '2026-03-25T00:00:00.000Z',
+                  lastSavedAt: '2026-03-25T00:00:00.000Z',
+                },
+              },
+            ],
+          }),
+        ),
+        createDraft: vi.fn(),
+        addEntriesToDraft: vi.fn(),
+        removeDraftEntry: vi.fn().mockResolvedValue(
+          createDraftDetailFixture({
+            entryCount: 1,
+            entries: [
+              {
+                id: 'draft-entry-2',
+                position: 1,
+                createdAt: '2026-03-26T00:00:00.000Z',
+                entry: {
+                  id: 'entry-2',
+                  title: '둘째 기록',
+                  body: '둘째 문장',
+                  status: 'draft',
+                  createdAt: '2026-03-25T00:00:00.000Z',
+                  updatedAt: '2026-03-25T00:00:00.000Z',
+                  lastSavedAt: '2026-03-25T00:00:00.000Z',
+                },
+              },
+            ],
+          }),
+        ),
+        reorderDraftEntries: vi.fn(),
+      },
+    });
+
+    await drafts.loadDraftDetail('draft-1');
+    await drafts.removeDraftEntry('draft-1', 'entry-1');
+
+    expect(drafts.removeState.value).toBe('idle');
+    expect(drafts.currentDraft.value?.entries.map((item) => item.entry.id)).toEqual([
+      'entry-2',
+    ]);
+    expect(drafts.currentDraft.value?.entries[0]?.position).toBe(1);
+  });
+
   it('reorders draft entries and syncs the current draft detail', async () => {
     const drafts = useDrafts({
       api: {
@@ -152,6 +233,7 @@ describe('useDrafts', () => {
         getDraft: vi.fn().mockResolvedValue(createDraftDetailFixture()),
         createDraft: vi.fn(),
         addEntriesToDraft: vi.fn(),
+        removeDraftEntry: vi.fn(),
         reorderDraftEntries: vi.fn().mockResolvedValue(
           createDraftDetailFixture({
             entries: [

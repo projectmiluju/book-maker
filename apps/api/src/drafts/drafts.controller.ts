@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -87,6 +88,17 @@ export class DraftsController {
       draftId,
       dto.entryIds,
     );
+
+    return toPublicDraftDetail(draft);
+  }
+
+  @Delete(':draftId/entries/:entryId')
+  async removeDraftEntry(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('draftId') draftId: string,
+    @Param('entryId') entryId: string,
+  ) {
+    const draft = await this.draftsService.removeDraftEntry(user.userId, draftId, entryId);
 
     return toPublicDraftDetail(draft);
   }

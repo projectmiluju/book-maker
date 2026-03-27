@@ -10,6 +10,34 @@
 
 ---
 
+## 2026-03-27 (Draft entry removal flow)
+
+### 완료
+
+- 이슈 `#29` 기준 `apps/api`에 `DELETE /drafts/:draftId/entries/:entryId` 계약과 제거 후 position 재정렬 로직 추가
+- 초안 상세 화면에서 담긴 기록을 바로 뺄 수 있는 UI와 remove mutation 상태, 오류 메시지 연결
+- 제거 직후 초안 목록/상세 동기화와 빈 초안 상태 반영을 `useDrafts`에 연결
+- Drafts 서비스 테스트, fake PostgreSQL/Redis e2e, 프론트 composable 테스트에 remove 시나리오 보강
+
+### 현재 상태
+
+- 사용자는 초안 상세 화면에서 불필요한 기록을 제거하고 남은 기록 순서를 연속된 position으로 유지할 수 있다
+- Draft Organization MVP 범위의 add / reorder / remove 흐름이 API와 프론트 양쪽에서 모두 연결되었다
+- 다음 핵심 후속 범위는 preview API와 실제 preview 화면 연결이다
+
+### 다음 액션
+
+1. draft preview API를 추가해 초안을 연속 읽기 데이터로 변환한다
+2. `/app/drafts/preview`를 실제 draft 데이터에 연결해 책처럼 읽히는 화면을 만든다
+3. draft detail에서 preview 진입 흐름을 연결하고 관련 테스트를 보강한다
+
+### 메모
+
+- 검증은 `pnpm --filter @book-maker/api lint`, `typecheck`, `test`, `test:e2e`, `pnpm --filter @book-maker/web lint`, `typecheck`, `test` 기준으로 확인
+- reorder 검증은 remove 이후가 아니라 빈 payload 경계로 유지해 API 계약과 테스트 의도를 맞췄다
+
+---
+
 ## 2026-03-26 (Draft reorder flow)
 
 ### 완료
