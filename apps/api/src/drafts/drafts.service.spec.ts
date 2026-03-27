@@ -368,4 +368,65 @@ describe('DraftsService', () => {
     expect(draft.entries.map((item) => item.entry.id)).toEqual(['entry-2']);
     expect(draft.entries.map((item) => item.position)).toEqual([1]);
   });
+
+  it('builds a draft preview response from ordered draft entries', async () => {
+    const updatedAt = new Date('2026-03-27T00:10:00.000Z');
+    const entryCreatedAt = new Date('2026-03-25T00:00:00.000Z');
+    const draftEntryCreatedAt = new Date('2026-03-26T00:00:00.000Z');
+
+    query
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            id: 'draft-1',
+            userId: 'user-1',
+            title: '초안',
+            description: '바다의 결',
+            status: 'active',
+            createdAt: updatedAt,
+            updatedAt,
+            entryCount: 2,
+          },
+        ],
+      })
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            id: 'draft-entry-1',
+            position: 1,
+            createdAt: draftEntryCreatedAt,
+            entryId: 'entry-1',
+            entryUserId: 'user-1',
+            entryTitle: '첫 기록',
+            entryBody: '첫 문장',
+            entryStatus: 'draft',
+            entryCreatedAt: entryCreatedAt,
+            entryUpdatedAt: entryCreatedAt,
+            entryLastSavedAt: entryCreatedAt,
+          },
+          {
+            id: 'draft-entry-2',
+            position: 2,
+            createdAt: draftEntryCreatedAt,
+            entryId: 'entry-2',
+            entryUserId: 'user-1',
+            entryTitle: null,
+            entryBody: '둘째 문장',
+            entryStatus: 'draft',
+            entryCreatedAt: entryCreatedAt,
+            entryUpdatedAt: entryCreatedAt,
+            entryLastSavedAt: entryCreatedAt,
+          },
+        ],
+      });
+
+    const preview = await draftsService.previewDraft('user-1', 'draft-1');
+
+    expect(preview.title).toBe('초안');
+    expect(preview.description).toBe('바다의 결');
+    expect(preview.entries).toEqual([
+      { id: 'entry-1', position: 1, title: '첫 기록', body: '첫 문장' },
+      { id: 'entry-2', position: 2, title: null, body: '둘째 문장' },
+    ]);
+  });
 });

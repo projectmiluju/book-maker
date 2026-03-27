@@ -10,6 +10,7 @@ import { DatabaseService } from '../infrastructure/database/database.service';
 import {
   DraftDetailRecord,
   DraftEntryRecord,
+  DraftPreviewRecord,
   DraftRecord,
   DraftStatus,
 } from './draft.types';
@@ -123,6 +124,23 @@ export class DraftsService {
     return {
       ...draft,
       entries,
+    };
+  }
+
+  async previewDraft(userId: string, draftId: string): Promise<DraftPreviewRecord> {
+    const draft = await this.findDraftById(userId, draftId);
+
+    return {
+      id: draft.id,
+      title: draft.title,
+      description: draft.description,
+      updatedAt: draft.updatedAt,
+      entries: draft.entries.map((draftEntry) => ({
+        id: draftEntry.entry.id,
+        position: draftEntry.position,
+        title: draftEntry.entry.title,
+        body: draftEntry.entry.body,
+      })),
     };
   }
 

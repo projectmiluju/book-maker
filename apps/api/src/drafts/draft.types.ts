@@ -35,6 +35,19 @@ export type DraftDetailRecord = DraftRecord & {
   entries: DraftEntryRecord[];
 };
 
+export type DraftPreviewRecord = {
+  id: string;
+  title: string;
+  description: string | null;
+  updatedAt: Date;
+  entries: Array<{
+    id: string;
+    position: number;
+    title: string | null;
+    body: string;
+  }>;
+};
+
 export type PublicDraft = {
   id: string;
   title: string;
@@ -54,6 +67,19 @@ export type PublicDraftEntry = {
 
 export type PublicDraftDetail = PublicDraft & {
   entries: PublicDraftEntry[];
+};
+
+export type PublicDraftPreview = {
+  id: string;
+  title: string;
+  description: string | null;
+  updatedAt: string;
+  entries: Array<{
+    id: string;
+    position: number;
+    title: string | null;
+    body: string;
+  }>;
 };
 
 export function toPublicDraft(draft: DraftRecord): PublicDraft {
@@ -76,6 +102,21 @@ export function toPublicDraftDetail(draft: DraftDetailRecord): PublicDraftDetail
       position: draftEntry.position,
       createdAt: draftEntry.createdAt.toISOString(),
       entry: toPublicEntry(draftEntry.entry),
+    })),
+  };
+}
+
+export function toPublicDraftPreview(draft: DraftPreviewRecord): PublicDraftPreview {
+  return {
+    id: draft.id,
+    title: draft.title,
+    description: draft.description,
+    updatedAt: draft.updatedAt.toISOString(),
+    entries: draft.entries.map((entry) => ({
+      id: entry.id,
+      position: entry.position,
+      title: entry.title,
+      body: entry.body,
     })),
   };
 }

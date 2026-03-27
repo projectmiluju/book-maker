@@ -105,6 +105,19 @@ type DraftDetailResponseBody = DraftResponseBody & {
   }>;
 };
 
+type DraftPreviewResponseBody = {
+  id: string;
+  title: string;
+  description: string | null;
+  updatedAt: string;
+  entries: Array<{
+    id: string;
+    position: number;
+    title: string | null;
+    body: string;
+  }>;
+};
+
 type StoredDraft = {
   id: string;
   userId: string;
@@ -1099,6 +1112,22 @@ describe('AppController (e2e)', () => {
     expect(removedDraft.entries[0].position).toBe(1);
     expect(removedDraft.entries[0].entry.id).toBe(firstEntry.id);
 
+    const previewResponse = await request(server)
+      .get(`/api/drafts/${createdDraft.id}/preview`)
+      .set('Authorization', `Bearer ${auth.accessToken}`)
+      .expect(200);
+    const previewBody = previewResponse.body as DraftPreviewResponseBody;
+
+    expect(previewBody.title).toBe('고요한 파도');
+    expect(previewBody.entries).toEqual([
+      {
+        id: firstEntry.id,
+        position: 1,
+        title: firstEntry.title,
+        body: firstEntry.body,
+      },
+    ]);
+
     await request(server)
       .delete(`/api/drafts/${createdDraft.id}/entries/${secondEntry.id}`)
       .set('Authorization', `Bearer ${auth.accessToken}`)
@@ -1174,6 +1203,11 @@ describe('AppController (e2e)', () => {
 
     await request(server)
       .delete(`/api/drafts/${ownerDraft.id}/entries/${ownerEntry.id}`)
+      .set('Authorization', `Bearer ${stranger.accessToken}`)
+      .expect(404);
+
+    await request(server)
+      .get(`/api/drafts/${ownerDraft.id}/preview`)
       .set('Authorization', `Bearer ${stranger.accessToken}`)
       .expect(404);
   });

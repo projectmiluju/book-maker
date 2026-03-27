@@ -12,7 +12,11 @@ import {
 import type { AuthenticatedUser } from '../auth/auth.types';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { AuthGuard } from '../auth/guards/auth.guard';
-import { toPublicDraft, toPublicDraftDetail } from './draft.types';
+import {
+  toPublicDraft,
+  toPublicDraftDetail,
+  toPublicDraftPreview,
+} from './draft.types';
 import { DraftsService } from './drafts.service';
 import { AddDraftEntriesDto } from './dto/add-draft-entries.dto';
 import { CreateDraftDto } from './dto/create-draft.dto';
@@ -39,6 +43,16 @@ export class DraftsController {
     const drafts = await this.draftsService.listDrafts(user.userId);
 
     return drafts.map(toPublicDraft);
+  }
+
+  @Get(':draftId/preview')
+  async previewDraft(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('draftId') draftId: string,
+  ) {
+    const draft = await this.draftsService.previewDraft(user.userId, draftId);
+
+    return toPublicDraftPreview(draft);
   }
 
   @Get(':draftId')

@@ -252,6 +252,12 @@ function handleEntrySelectionChange(entryId: string, event: Event) {
           </p>
         </div>
         <div class="page-tools">
+          <NuxtLink
+            class="button-primary"
+            :to="`/app/drafts/preview?draftId=${draftId}`"
+          >
+            미리보기
+          </NuxtLink>
           <NuxtLink class="button-ghost" to="/app/drafts">목록으로</NuxtLink>
           <NuxtLink class="button-ghost" to="/app/archive">아카이브</NuxtLink>
         </div>
@@ -306,6 +312,14 @@ function handleEntrySelectionChange(entryId: string, event: Event) {
             <span>기록 {{ currentDraft.entries.length }}개</span>
             <span>{{ currentDraft.status === 'active' ? '활성' : '보관' }}</span>
             <span>{{ formatEntryDateTime(currentDraft.updatedAt) }}</span>
+          </div>
+          <div class="draft-create-actions">
+            <NuxtLink
+              class="button-primary"
+              :to="`/app/drafts/preview?draftId=${draftId}`"
+            >
+              책처럼 읽어보기
+            </NuxtLink>
           </div>
         </div>
 

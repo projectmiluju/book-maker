@@ -1226,6 +1226,11 @@ textarea {
   line-height: 1.75;
 }
 
+.preview-timestamp {
+  margin-top: 12px;
+  font-size: 13px;
+}
+
 .preview-divider {
   width: 48px;
   height: 1px;
