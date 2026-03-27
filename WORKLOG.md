@@ -38,6 +38,33 @@
 
 ---
 
+## 2026-03-27 (Playwright smoke gate operations)
+
+### 완료
+
+- 이슈 `#41` 기준 Playwright가 `test-results`와 HTML report를 명시적으로 남기도록 설정해 CI 실패 분석 경로를 고정
+- GitHub Actions `ci.yml`에 Playwright artifact 업로드를 추가해 smoke 실패 시 trace, screenshot, report를 바로 확인할 수 있게 정리
+- smoke 시나리오 수를 늘리지 않고 현재 core-loop + auth-expiry 2개 시나리오의 운영 디버깅 가능성을 우선 보강
+
+### 현재 상태
+
+- CI에서 Playwright smoke가 실패해도 report와 test-results를 artifact로 수집해 원인 파악이 쉬워졌다
+- 현재 품질 게이트는 smoke 실행 자체뿐 아니라 실패 분석 자산까지 함께 남기는 구조가 됐다
+- 남은 후속 작업은 실제 GitHub Actions run 기준으로 timeout, retry, artifact 크기를 보며 필요한 범위만 미세 조정하는 쪽이다
+
+### 다음 액션
+
+1. GitHub Actions 실제 run에서 artifact 업로드와 report 내용을 확인해 디버깅 동선이 충분한지 점검한다
+2. smoke 실행 시간이 길어지면 retry 수나 step 분리를 최소 범위로 조정한다
+3. 후속 smoke 시나리오가 늘어나더라도 현재 artifact 구조를 유지할지 별도 job으로 나눌지 판단한다
+
+### 메모
+
+- 검증은 `pnpm --filter @book-maker/web lint`, `typecheck`, `pnpm test:web:e2e` 기준으로 확인한다
+- artifact 업로드는 실패 전용이 아니라 `always()`로 두어 flaky 분석 시에도 동일한 산출물을 확보한다
+
+---
+
 ## 2026-03-27 (Auth expiry smoke e2e)
 
 ### 완료
