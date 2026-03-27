@@ -10,6 +10,34 @@
 
 ---
 
+## 2026-03-27 (Playwright smoke e2e CI stabilization)
+
+### 완료
+
+- 이슈 `#37` 기준 GitHub Actions `ci.yml`에서 web smoke e2e를 Docker Compose 대신 service container 기반으로 정리
+- PostgreSQL / Redis, auth env, Playwright browser cache를 job 레벨에서 명시해 CI 전제를 runner 외부 상태에 덜 의존하도록 보강
+- `apps/web/playwright.config.ts`에서 CI일 때는 Nuxt preview와 non-watch API server를 사용하도록 바꿔 smoke 기동 순서를 더 안정화
+- API CORS가 `NUXT_PORT` 기반 preview origin도 허용하도록 맞춰 CI smoke에서 signup 요청이 브라우저 정책에 막히지 않게 조정
+
+### 현재 상태
+
+- web smoke e2e는 local과 CI에서 서로 다른 서버 기동 특성을 가지되 같은 시나리오를 공유하도록 정리되었다
+- PR 품질 게이트가 Docker Compose 컨테이너 이름이나 watch server 재시작에 덜 의존하게 되었다
+- 남은 후속 작업은 인증 만료 대응 같은 추가 smoke 시나리오를 넓히는 쪽이다
+
+### 다음 액션
+
+1. 인증 만료 대응 smoke 시나리오를 추가해 세션 단절 리스크를 브라우저 수준에서 보호한다
+2. CI에서 smoke 실행 시간을 보며 cache key나 step 순서를 필요한 범위만 다듬는다
+3. 핵심 루프 smoke가 충분히 안정적이면 후속 시나리오를 별도 이슈로 점진적으로 확장한다
+
+### 메모
+
+- 검증은 `pnpm --filter @book-maker/web lint`, `typecheck`, `test`, `build`, `CI=true pnpm test:web:e2e` 기준으로 확인한다
+- CI에서는 built web app을 `nuxt preview`로 띄우고, API는 watch 없는 `nest start` 경로를 사용한다
+
+---
+
 ## 2026-03-27 (Playwright smoke e2e baseline)
 
 ### 완료

@@ -21,17 +21,24 @@ function isAppConfig(value: unknown): value is AppConfig {
 export function applyGlobalAppConfig(app: INestApplication): number {
   const configService = app.get(ConfigService);
   const appConfigValue: unknown = configService.getOrThrow('app');
+  const nuxtPort = process.env.NUXT_PORT;
+  const allowedOrigins = new Set([
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+  ]);
 
   if (!isAppConfig(appConfigValue)) {
     throw new Error('App config is missing required keys.');
   }
 
+  if (nuxtPort) {
+    allowedOrigins.add(`http://localhost:${nuxtPort}`);
+    allowedOrigins.add(`http://127.0.0.1:${nuxtPort}`);
+  }
+
   app.setGlobalPrefix(appConfigValue.prefix);
   app.enableCors({
-    origin: [
-      'http://localhost:3000',
-      'http://127.0.0.1:3000',
-    ],
+    origin: Array.from(allowedOrigins),
     methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   });

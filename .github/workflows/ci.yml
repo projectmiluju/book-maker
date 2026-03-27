@@ -11,6 +11,47 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      POSTGRES_HOST: 127.0.0.1
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: book_maker
+      POSTGRES_USER: book_maker
+      POSTGRES_PASSWORD: book_maker
+      API_PORT: 4100
+      NUXT_PORT: 3100
+      REDIS_HOST: 127.0.0.1
+      REDIS_PORT: 6379
+      REDIS_DB: 0
+      AUTH_ACCESS_TOKEN_SECRET: book-maker-access-secret
+      AUTH_ACCESS_TOKEN_EXPIRES_IN: 15m
+      AUTH_REFRESH_TOKEN_SECRET: book-maker-refresh-secret
+      AUTH_REFRESH_TOKEN_EXPIRES_IN: 14d
+      AUTH_REFRESH_SESSION_PREFIX: auth:refresh
+      PLAYWRIGHT_BROWSERS_PATH: ~/.cache/ms-playwright
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: book_maker
+          POSTGRES_USER: book_maker
+          POSTGRES_PASSWORD: book_maker
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U book_maker -d book_maker"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - name: Checkout
@@ -30,6 +71,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Restore Playwright browser cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
+
       - name: Lint
         run: pnpm lint
 
@@ -44,17 +91,6 @@ jobs:
 
       - name: API e2e test
         run: pnpm test:api:e2e
-
-      - name: Start local infra for web smoke e2e
-        run: docker compose up -d postgres redis
-
-      - name: Wait for postgres and redis health
-        run: |
-          for service in book-maker-postgres book-maker-redis; do
-            until [ "$(docker inspect -f '{{.State.Health.Status}}' "$service")" = "healthy" ]; do
-              sleep 2
-            done
-          done
 
       - name: Install Playwright browser
         run: pnpm --filter @book-maker/web exec playwright install --with-deps chromium
