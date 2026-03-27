@@ -3,6 +3,7 @@ import type {
   CreateDraftInput,
   PublicDraft,
   PublicDraftDetail,
+  PublicDraftPreview,
 } from '../types/drafts';
 import type { EntryInput, PublicEntry } from '../types/entries';
 
@@ -105,6 +106,11 @@ export function createDraftsApiClient(
     },
     getDraft(draftId: string) {
       return requestJson<PublicDraftDetail>(fetcher, baseUrl, `/drafts/${draftId}`, {
+        headers: createAuthHeaders(getAccessToken),
+      });
+    },
+    getDraftPreview(draftId: string) {
+      return requestJson<PublicDraftPreview>(fetcher, baseUrl, `/drafts/${draftId}/preview`, {
         headers: createAuthHeaders(getAccessToken),
       });
     },

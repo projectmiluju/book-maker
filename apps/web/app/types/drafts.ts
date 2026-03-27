@@ -25,6 +25,19 @@ export type PublicDraftDetail = PublicDraft & {
   entries: PublicDraftEntry[];
 };
 
+export type PublicDraftPreview = {
+  id: string;
+  title: string;
+  description: string | null;
+  updatedAt: string;
+  entries: Array<{
+    id: string;
+    position: number;
+    title: string | null;
+    body: string;
+  }>;
+};
+
 export type CreateDraftInput = {
   title: string;
   description?: string;

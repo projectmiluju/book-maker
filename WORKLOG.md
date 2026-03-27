@@ -10,6 +10,34 @@
 
 ---
 
+## 2026-03-27 (Draft preview flow)
+
+### 완료
+
+- 이슈 `#31` 기준 `apps/api`에 `GET /drafts/:id/preview` 계약과 preview 응답 타입을 추가
+- 초안 ownership과 존재하지 않는 draft 경계를 유지한 채 ordered entry를 연속 읽기용 preview 데이터로 변환
+- `apps/web/app/pages/app/drafts/preview.vue`를 실제 API 기반 화면으로 교체하고 draft detail에서 preview 진입 링크 연결
+- `useDraftPreview` composable과 관련 단위 테스트를 추가하고 preview reading layout을 실제 초안 데이터에 맞게 보강
+
+### 현재 상태
+
+- 사용자는 초안 상세 화면에서 바로 미리보기로 이동해 제목과 기록 본문을 한 권의 시작처럼 연속해서 읽어볼 수 있다
+- Draft Flow 이후 MVP 핵심 루프가 preview 단계까지 이어져 `write -> archive -> draft -> preview` 흐름이 실제 코드로 연결되었다
+- 남은 주요 MVP 화면 범위는 랜딩 페이지 실제 구현과 preview 경험 세부 다듬기 정도다
+
+### 다음 액션
+
+1. draft preview에서 detail로 복귀하는 흐름과 reading polish를 필요한 범위만 다듬는다
+2. 랜딩 페이지를 실제 Nuxt 화면으로 옮겨 MVP 주요 화면 구현을 마무리한다
+3. 필요하면 preview 핵심 흐름에 대한 E2E 시나리오를 후속 이슈로 추가한다
+
+### 메모
+
+- 검증은 `pnpm --filter @book-maker/api lint`, `typecheck`, `test`, `test:e2e`, `build`, `pnpm --filter @book-maker/web lint`, `typecheck`, `test`, `build` 기준으로 확인
+- web build는 Nuxt `module-preload-polyfill` sourcemap 경고가 있었지만 빌드는 정상 완료됐다
+
+---
+
 ## 2026-03-27 (Draft entry removal flow)
 
 ### 완료
