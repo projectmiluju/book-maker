@@ -10,6 +10,34 @@
 
 ---
 
+## 2026-03-27 (Landing page implementation)
+
+### 완료
+
+- 이슈 `#33` 기준 `apps/web/app/pages/index.vue` 랜딩 페이지를 실제 Nuxt 화면으로 재구성
+- 현재 MVP 흐름에 맞춘 hero, 문제 설명, 사용 흐름, 구현 상태, CTA 섹션을 한글 카피 기준으로 정리
+- `landing-content.ts`로 랜딩 문구와 링크를 분리하고 Vitest로 핵심 구조/경로를 검증
+- 랜딩 전용 스타일을 보강해 prototype 방향을 유지하면서 현재 앱 라우트 기준 CTA를 실제 동작 경로로 연결
+
+### 현재 상태
+
+- 사용자는 랜딩에서 제품 메시지와 현재 구현된 MVP 흐름을 한눈에 이해하고, 바로 기록/아카이브/초안 화면으로 진입할 수 있다
+- `안녕, 나의 바다`의 public-facing 첫 화면이 정적 시안이 아니라 실제 앱 상태와 맞는 Nuxt 화면으로 연결되었다
+- MVP 핵심 화면 범위는 구현되었고, 남은 후속 작업은 polish와 핵심 E2E 보강 쪽에 가깝다
+
+### 다음 액션
+
+1. preview와 landing을 포함한 핵심 사용자 흐름 E2E 시나리오를 설계하고 최소 smoke 범위를 추가한다
+2. 랜딩과 app 사이 전환에서 copy / spacing / CTA 우선순위를 필요한 범위만 다듬는다
+3. PR 품질 게이트 기준으로 web build 경고와 향후 CI 연동 범위를 점검한다
+
+### 메모
+
+- 검증은 `pnpm --filter @book-maker/web lint`, `typecheck`, `test`, `build` 기준으로 확인
+- web build는 Nuxt `module-preload-polyfill` sourcemap 경고가 있었지만 빌드는 정상 완료됐다
+
+---
+
 ## 2026-03-27 (Draft preview flow)
 
 ### 완료
