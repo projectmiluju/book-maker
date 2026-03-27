@@ -300,6 +300,59 @@ export class DraftsService {
     return this.findDraftById(userId, draftId);
   }
 
+  async removeDraftEntry(
+    userId: string,
+    draftId: string,
+    entryId: string,
+  ): Promise<DraftDetailRecord> {
+    await this.findDraftRecordById(userId, draftId);
+
+    const currentEntries = await this.listDraftEntries(draftId);
+    const removedEntry = currentEntries.find((draftEntry) => draftEntry.entry.id === entryId);
+
+    if (!removedEntry) {
+      throw new NotFoundException('초안에 담긴 기록을 찾을 수 없습니다.');
+    }
+
+    await this.databaseService.getPool().query(
+      `
+        DELETE FROM draft_entries
+        WHERE draft_id = $1 AND entry_id = $2
+      `,
+      [draftId, entryId],
+    );
+
+    const remainingEntries = currentEntries.filter(
+      (draftEntry) => draftEntry.entry.id !== entryId,
+    );
+
+    let position = 0;
+
+    for (const draftEntry of remainingEntries) {
+      position += 1;
+
+      await this.databaseService.getPool().query(
+        `
+          UPDATE draft_entries
+          SET position = $3
+          WHERE draft_id = $1 AND entry_id = $2
+        `,
+        [draftId, draftEntry.entry.id, position],
+      );
+    }
+
+    await this.databaseService.getPool().query(
+      `
+        UPDATE drafts
+        SET updated_at = NOW()
+        WHERE id = $1 AND user_id = $2
+      `,
+      [draftId, userId],
+    );
+
+    return this.findDraftById(userId, draftId);
+  }
+
   private async findDraftRecordById(userId: string, draftId: string): Promise<DraftRecord> {
     const result = await this.databaseService.getPool().query<DraftRow>(
       `

@@ -15,6 +15,7 @@ type DraftsApi = {
   getDraft(draftId: string): Promise<PublicDraftDetail>;
   createDraft(input: CreateDraftInput): Promise<PublicDraft>;
   addEntriesToDraft(draftId: string, entryIds: string[]): Promise<PublicDraftDetail>;
+  removeDraftEntry(draftId: string, entryId: string): Promise<PublicDraftDetail>;
   reorderDraftEntries(draftId: string, entryIds: string[]): Promise<PublicDraftDetail>;
 };
 
@@ -33,6 +34,8 @@ export function useDrafts(options: UseDraftsOptions) {
   const createError = ref('');
   const attachState = ref<DraftMutationState>('idle');
   const attachError = ref('');
+  const removeState = ref<DraftMutationState>('idle');
+  const removeError = ref('');
   const reorderState = ref<DraftMutationState>('idle');
   const reorderError = ref('');
 
@@ -130,6 +133,26 @@ export function useDrafts(options: UseDraftsOptions) {
     }
   }
 
+  async function removeDraftEntry(draftId: string, entryId: string) {
+    removeState.value = 'submitting';
+    removeError.value = '';
+
+    try {
+      const draft = await options.api.removeDraftEntry(draftId, entryId);
+      currentDraft.value = draft;
+      syncDraft(draft);
+      removeState.value = 'idle';
+
+      return draft;
+    } catch {
+      removeState.value = 'error';
+      removeError.value =
+        '초안에서 기록을 빼지 못했습니다. 잠시 후 다시 시도해 주세요.';
+
+      return null;
+    }
+  }
+
   function syncDraft(draft: PublicDraft) {
     const index = drafts.value.findIndex((item) => item.id === draft.id);
 
@@ -156,12 +179,15 @@ export function useDrafts(options: UseDraftsOptions) {
     createError,
     attachState,
     attachError,
+    removeState,
+    removeError,
     reorderState,
     reorderError,
     loadDrafts,
     loadDraftDetail,
     createDraft,
     addEntriesToDraft,
+    removeDraftEntry,
     reorderDraftEntries,
   };
 }

@@ -236,4 +236,136 @@ describe('DraftsService', () => {
     expect(draft.entries.map((item) => item.entry.id)).toEqual(['entry-2', 'entry-1']);
     expect(draft.entries.map((item) => item.position)).toEqual([1, 2]);
   });
+
+  it('throws when removing an entry that is not in the draft', async () => {
+    query
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            id: 'draft-1',
+            userId: 'user-1',
+            title: '초안',
+            description: null,
+            status: 'active',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            entryCount: 1,
+          },
+        ],
+      })
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            id: 'draft-entry-1',
+            position: 1,
+            createdAt: new Date(),
+            entryId: 'entry-1',
+            entryUserId: 'user-1',
+            entryTitle: '첫 기록',
+            entryBody: '첫 문장',
+            entryStatus: 'draft',
+            entryCreatedAt: new Date(),
+            entryUpdatedAt: new Date(),
+            entryLastSavedAt: new Date(),
+          },
+        ],
+      });
+
+    await expect(
+      draftsService.removeDraftEntry('user-1', 'draft-1', 'entry-9'),
+    ).rejects.toBeInstanceOf(NotFoundException);
+  });
+
+  it('removes a draft entry, reorders positions, and returns the updated detail', async () => {
+    const initialUpdatedAt = new Date('2026-03-26T00:00:00.000Z');
+    const removedUpdatedAt = new Date('2026-03-26T00:10:00.000Z');
+    const entryCreatedAt = new Date('2026-03-25T00:00:00.000Z');
+    const draftEntryCreatedAt = new Date('2026-03-26T00:00:00.000Z');
+
+    query
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            id: 'draft-1',
+            userId: 'user-1',
+            title: '초안',
+            description: null,
+            status: 'active',
+            createdAt: initialUpdatedAt,
+            updatedAt: initialUpdatedAt,
+            entryCount: 2,
+          },
+        ],
+      })
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            id: 'draft-entry-1',
+            position: 1,
+            createdAt: draftEntryCreatedAt,
+            entryId: 'entry-1',
+            entryUserId: 'user-1',
+            entryTitle: '첫 기록',
+            entryBody: '첫 문장',
+            entryStatus: 'draft',
+            entryCreatedAt: entryCreatedAt,
+            entryUpdatedAt: entryCreatedAt,
+            entryLastSavedAt: entryCreatedAt,
+          },
+          {
+            id: 'draft-entry-2',
+            position: 2,
+            createdAt: draftEntryCreatedAt,
+            entryId: 'entry-2',
+            entryUserId: 'user-1',
+            entryTitle: '둘째 기록',
+            entryBody: '둘째 문장',
+            entryStatus: 'draft',
+            entryCreatedAt: entryCreatedAt,
+            entryUpdatedAt: entryCreatedAt,
+            entryLastSavedAt: entryCreatedAt,
+          },
+        ],
+      })
+      .mockResolvedValueOnce({ rowCount: 1, rows: [] })
+      .mockResolvedValueOnce({ rowCount: 1, rows: [] })
+      .mockResolvedValueOnce({ rowCount: 1, rows: [] })
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            id: 'draft-1',
+            userId: 'user-1',
+            title: '초안',
+            description: null,
+            status: 'active',
+            createdAt: initialUpdatedAt,
+            updatedAt: removedUpdatedAt,
+            entryCount: 1,
+          },
+        ],
+      })
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            id: 'draft-entry-2',
+            position: 1,
+            createdAt: draftEntryCreatedAt,
+            entryId: 'entry-2',
+            entryUserId: 'user-1',
+            entryTitle: '둘째 기록',
+            entryBody: '둘째 문장',
+            entryStatus: 'draft',
+            entryCreatedAt: entryCreatedAt,
+            entryUpdatedAt: entryCreatedAt,
+            entryLastSavedAt: entryCreatedAt,
+          },
+        ],
+      });
+
+    const draft = await draftsService.removeDraftEntry('user-1', 'draft-1', 'entry-1');
+
+    expect(draft.entryCount).toBe(1);
+    expect(draft.entries.map((item) => item.entry.id)).toEqual(['entry-2']);
+    expect(draft.entries.map((item) => item.position)).toEqual([1]);
+  });
 });

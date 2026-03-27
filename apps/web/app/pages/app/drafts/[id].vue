@@ -43,6 +43,9 @@ const {
   detailError,
   detailState,
   loadDraftDetail,
+  removeDraftEntry,
+  removeError,
+  removeState,
   reorderDraftEntries,
   reorderError,
   reorderState,
@@ -130,7 +133,11 @@ function buildOrderLabel(position: number) {
 }
 
 function canMoveEntry(index: number, direction: 'up' | 'down') {
-  if (!currentDraft.value || reorderState.value === 'submitting') {
+  if (
+    !currentDraft.value ||
+    reorderState.value === 'submitting' ||
+    removeState.value === 'submitting'
+  ) {
     return false;
   }
 
@@ -167,6 +174,14 @@ async function moveDraftEntry(entryId: string, direction: 'up' | 'down') {
   nextEntryIds.splice(nextIndex, 0, movedEntryId);
 
   await reorderDraftEntries(draftId.value, nextEntryIds);
+}
+
+async function handleDraftEntryRemove(entryId: string) {
+  if (!currentDraft.value || removeState.value === 'submitting') {
+    return;
+  }
+
+  await removeDraftEntry(draftId.value, entryId);
 }
 
 async function loadDraftResources(nextDraftId: string) {
@@ -354,6 +369,9 @@ function handleEntrySelectionChange(entryId: string, event: Event) {
         <section>
           <div class="sequence-header">초안에 담긴 기록</div>
 
+          <p v-if="removeState === 'error'" class="writer-alert writer-alert-error">
+            {{ removeError }}
+          </p>
           <p v-if="reorderState === 'error'" class="writer-alert writer-alert-error">
             {{ reorderError }}
           </p>
@@ -397,6 +415,14 @@ function handleEntrySelectionChange(entryId: string, event: Event) {
                     @click="moveDraftEntry(draftEntry.entry.id, 'down')"
                   >
                     아래로
+                  </button>
+                  <button
+                    class="button-ghost sequence-action"
+                    type="button"
+                    :disabled="removeState === 'submitting'"
+                    @click="handleDraftEntryRemove(draftEntry.entry.id)"
+                  >
+                    {{ removeState === 'submitting' ? '빼는 중...' : '빼기' }}
                   </button>
                 </div>
               </div>

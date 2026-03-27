@@ -127,6 +127,17 @@ export function createDraftsApiClient(
         },
       );
     },
+    removeDraftEntry(draftId: string, entryId: string) {
+      return requestJson<PublicDraftDetail>(
+        fetcher,
+        baseUrl,
+        `/drafts/${draftId}/entries/${entryId}`,
+        {
+          method: 'DELETE',
+          headers: createAuthHeaders(getAccessToken),
+        },
+      );
+    },
     reorderDraftEntries(draftId: string, entryIds: string[]) {
       return requestJson<PublicDraftDetail>(
         fetcher,
