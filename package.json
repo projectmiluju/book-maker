@@ -9,6 +9,7 @@
     "lint:web": "pnpm --filter @book-maker/web lint",
     "lint:fix:web": "pnpm --filter @book-maker/web lint:fix",
     "test:web": "pnpm --filter @book-maker/web test",
+    "test:web:e2e": "pnpm --filter @book-maker/web test:e2e",
     "typecheck:web": "pnpm --filter @book-maker/web typecheck",
     "dev:api": "pnpm --filter @book-maker/api start:dev",
     "build:api": "pnpm --filter @book-maker/api build",

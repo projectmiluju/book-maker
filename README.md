@@ -94,5 +94,6 @@
 - `pnpm lint`
 - `pnpm lint:fix`
 - `pnpm typecheck`
+- `pnpm test:web:e2e`
 - `pnpm format`
 - `pnpm format:check`

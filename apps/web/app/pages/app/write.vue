@@ -260,12 +260,17 @@ function formatTime(value: string) {
             </button>
           </div>
 
-          <form class="writer-auth-form" @submit.prevent="submitAuth">
+          <form
+            class="writer-auth-form"
+            data-testid="auth-form"
+            @submit.prevent="submitAuth"
+          >
             <label v-if="authMode === 'signup'" class="writer-auth-field">
               <span>이름</span>
               <input
                 v-model="authForm.displayName"
                 autocomplete="name"
+                data-testid="auth-display-name-input"
                 placeholder="기록에 남길 이름"
                 type="text"
               />
@@ -276,6 +281,7 @@ function formatTime(value: string) {
               <input
                 v-model="authForm.email"
                 autocomplete="email"
+                data-testid="auth-email-input"
                 placeholder="you@example.com"
                 type="email"
               />
@@ -286,6 +292,7 @@ function formatTime(value: string) {
               <input
                 v-model="authForm.password"
                 autocomplete="current-password"
+                data-testid="auth-password-input"
                 placeholder="8자 이상"
                 type="password"
               />
@@ -295,7 +302,12 @@ function formatTime(value: string) {
               {{ authError }}
             </p>
 
-            <button class="button-primary" type="submit" :disabled="authPending">
+            <button
+              class="button-primary"
+              data-testid="auth-submit-button"
+              type="submit"
+              :disabled="authPending"
+            >
               {{
                 authPending
                   ? '세션 준비 중...'
@@ -308,10 +320,16 @@ function formatTime(value: string) {
         </article>
       </div>
 
-      <article v-else class="writer-sheet">
+      <article v-else class="writer-sheet" data-testid="writer-sheet">
         <div class="writer-topline">
           <span class="writer-meta">{{ entryDateLabel }}</span>
-          <span class="dot-status" :data-tone="saveState">{{ saveStatusLabel }}</span>
+          <span
+            class="dot-status"
+            data-testid="entry-save-status"
+            :data-tone="saveState"
+          >
+            {{ saveStatusLabel }}
+          </span>
         </div>
 
         <p v-if="entryLoadPending" class="writer-alert">기존 기록을 불러오는 중입니다.</p>
@@ -336,6 +354,7 @@ function formatTime(value: string) {
         <input
           v-model="title"
           class="writer-title"
+          data-testid="entry-title-input"
           placeholder="제목 (선택)"
           spellcheck="false"
         />
@@ -343,6 +362,7 @@ function formatTime(value: string) {
         <textarea
           v-model="body"
           class="writer-body"
+          data-testid="entry-body-input"
           placeholder="오늘의 장면이나 생각을 남겨 보세요."
           rows="14"
         />
@@ -359,7 +379,11 @@ function formatTime(value: string) {
         </div>
 
         <div v-if="savedArchiveLink" class="writer-links">
-          <NuxtLink class="button-ghost" :to="savedArchiveLink.archive">
+          <NuxtLink
+            class="button-ghost"
+            data-testid="entry-archive-link"
+            :to="savedArchiveLink.archive"
+          >
             아카이브에서 확인
           </NuxtLink>
           <NuxtLink class="button-ghost" :to="savedArchiveLink.detail">

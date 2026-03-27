@@ -316,6 +316,7 @@ function handleEntrySelectionChange(entryId: string, event: Event) {
           <div class="draft-create-actions">
             <NuxtLink
               class="button-primary"
+              data-testid="draft-open-preview"
               :to="`/app/drafts/preview?draftId=${draftId}`"
             >
               책처럼 읽어보기
@@ -369,6 +370,7 @@ function handleEntrySelectionChange(entryId: string, event: Event) {
             <div class="draft-create-actions">
               <button
                 class="button-primary"
+                data-testid="draft-attach-submit"
                 type="button"
                 :disabled="!canSubmitEntryAttach"
                 @click="submitEntryAttach"
