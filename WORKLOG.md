@@ -10,6 +10,33 @@
 
 ---
 
+## 2026-03-27 (MVP closeout and Phase 2 entry)
+
+### 완료
+
+- 이슈 `#43` 기준 현재 저장소 상태를 다시 점검해 MVP 기능 범위와 실제 구현 상태가 일치하는지 문서 기준으로 정리
+- `README.md`, `AGENTS.md`, `MVP_SCOPE.md`, `IMPLEMENTATION_PHASES.md`, `TEST_STRATEGY.md`, `DEVOPS_CICD_PLAN.md`에 MVP 완료 상태와 Phase 2 진입 기준을 반영
+- 남은 작업을 `must-have MVP`가 아니라 `non-blocking polish`와 `Phase 2` 후보로 구분하는 기준을 문서에 남김
+
+### 현재 상태
+
+- MVP 핵심 루프와 기본 품질 게이트는 저장소 기준으로 닫힌 상태다
+- 이제 새 기능 구현은 기본적으로 `Phase 2. Writing Depth And Archive Intelligence` 범위에서 선택하면 된다
+- 남은 MVP 관련 일은 회귀 대응이나 작은 polish 수준으로만 다루는 것이 맞다
+
+### 다음 액션
+
+1. `Phase 2` 첫 이슈를 선택해 writing depth 또는 archive intelligence 범위 구현을 시작한다
+2. MVP 회귀로 볼 수 있는 문제만 별도 fix/chore로 추적하고, 나머지는 Phase 2 우선순위에 종속시킨다
+3. 새 기능이 로드맵 후반 범위로 새지 않도록 `ROADMAP.md` 기준으로 범위를 계속 통제한다
+
+### 메모
+
+- 이번 작업은 기능 추가가 아니라 문서 closeout과 기준 정리에 집중했다
+- 이후 세션의 기본 질문은 "이 작업이 MVP2 학습을 앞으로 미는가"로 바뀐다
+
+---
+
 ## 2026-03-27 (Playwright smoke e2e CI stabilization)
 
 ### 완료

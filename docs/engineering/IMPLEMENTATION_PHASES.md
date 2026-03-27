@@ -320,6 +320,27 @@ The MVP is complete when:
 - a user can preview that draft as a book-like reading flow
 - the product has a clear landing page
 
+## 14.1 Current Repository Status
+
+The current repository has completed the MVP definition above.
+
+Implemented status:
+
+- Phase 0 through Phase 7 deliverables are connected in the real application
+- the private core loop `write -> archive -> draft -> preview` is testable end to end
+- landing and app entry flows are connected
+- Playwright smoke and auth-expiry smoke support CI quality gating
+
+From this point, new product work should default to Phase 2 unless a true MVP regression or closeout gap is discovered.
+
+## 14.2 Phase 2 Entry Criteria
+
+Phase 2 work should start only when:
+
+- the MVP loop remains green in current CI quality gates
+- remaining MVP tasks are clearly identified as non-blocking polish
+- new work strengthens private writing depth or archive intelligence without expanding into later roadmap phases
+
 ## 15. Recommended Next Documents
 
 The next planning documents should be:

@@ -3,7 +3,14 @@
 짧은 기록을 차곡차곡 쌓아 두고, 그것이 한 권의 책 초안으로 자라나게 만드는 글쓰기 제품.
 공식 서비스명은 `안녕, 나의 바다`이며, 저장소와 내부 패키지 작업명은 당분간 `book-maker`를 유지한다.
 
-현재 이 레포는 실제 구현에 들어가기 전 단계의 기준 저장소다. 제품 기획, 정보 구조, 기술 의사결정, 데이터 모델, 프로토타입, 한글 UX 카피까지 먼저 정리해 두었다.
+현재 이 레포는 MVP 핵심 루프 구현과 기본 품질 게이트 정리까지 마친 상태다. 제품 기획, 정보 구조, 기술 의사결정, 데이터 모델, 정적 프로토타입 위에서 실제 Nuxt/Nest 앱, PostgreSQL/Redis 연동, 인증, 기록/아카이브/초안/미리보기, 랜딩 페이지, Playwright smoke E2E까지 연결되어 있다.
+
+## 현재 상태
+
+- MVP 핵심 루프 `write -> archive -> draft -> preview` 구현 완료
+- 랜딩 페이지와 실제 앱 진입 CTA 연결 완료
+- Playwright smoke E2E와 auth-expiry smoke, CI artifact 수집 경로까지 반영
+- 다음 기본 작업 범위는 `Phase 2. Writing Depth And Archive Intelligence`
 
 ## 현재 방향
 
@@ -76,18 +83,15 @@
 
 시안은 Stitch 결과를 바탕으로 MVP 방향에 맞게 덜어낸 버전이다.
 
-## 다음 구현 순서
+## 다음 구현 방향
 
-1. Nuxt 3 프로젝트 초기화
-2. NestJS 프로젝트 초기화
-3. PostgreSQL / Redis 로컬 개발 환경 연결
-4. 테스트 전략과 CI 기본 골격 반영
-5. 인증 기초 구현
-6. 기록 작성 / 자동 저장 / 아카이브 구현
-7. 초안 생성 / 정렬 / 미리보기 구현
-8. 랜딩 페이지 실제 구현
+MVP는 기능 기준으로 닫힌 상태다. 다음 작업은 아래 순서를 기본으로 잡는다.
 
-세부 순서는 [IMPLEMENTATION_PHASES.md](docs/engineering/IMPLEMENTATION_PHASES.md)를 따른다.
+1. MVP closeout 기준과 문서를 유지
+2. non-blocking polish는 작은 범위로만 정리
+3. `Phase 2. Writing Depth And Archive Intelligence` 범위 이슈를 순차적으로 진행
+
+세부 기준은 [IMPLEMENTATION_PHASES.md](docs/engineering/IMPLEMENTATION_PHASES.md), [MVP_SCOPE.md](docs/product/MVP_SCOPE.md), [ROADMAP.md](docs/product/ROADMAP.md)를 따른다.
 
 ## 품질 명령
 
