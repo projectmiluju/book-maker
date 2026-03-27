@@ -44,3 +44,20 @@ jobs:
 
       - name: API e2e test
         run: pnpm test:api:e2e
+
+      - name: Start local infra for web smoke e2e
+        run: docker compose up -d postgres redis
+
+      - name: Wait for postgres and redis health
+        run: |
+          for service in book-maker-postgres book-maker-redis; do
+            until [ "$(docker inspect -f '{{.State.Health.Status}}' "$service")" = "healthy" ]; do
+              sleep 2
+            done
+          done
+
+      - name: Install Playwright browser
+        run: pnpm --filter @book-maker/web exec playwright install --with-deps chromium
+
+      - name: Web smoke e2e test
+        run: pnpm test:web:e2e

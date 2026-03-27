@@ -9,6 +9,7 @@ import { formatEntryDateTime } from '../../utils/entry-format';
 definePageMeta({ layout: 'app' });
 
 const runtimeConfig = useRuntimeConfig();
+const route = useRoute();
 
 const {
   hydrated,
@@ -42,6 +43,7 @@ const createForm = reactive({
 const draftCountLabel = computed(() =>
   listState.value === 'loaded' ? `초안 ${drafts.value.length}개` : '초안 흐름을 준비하는 중',
 );
+const isDraftListRoute = computed(() => route.path === '/app/drafts');
 
 watch(
   [hydrated, isAuthenticated],
@@ -90,7 +92,7 @@ function formatStatus(status: 'active' | 'archived') {
 </script>
 
 <template>
-  <main class="app-grid">
+  <main v-if="isDraftListRoute" class="app-grid">
     <aside class="sidebar">
       <div>
         <div class="sidebar-badge">초안</div>
@@ -156,7 +158,12 @@ function formatStatus(status: 'active' | 'archived') {
           <form class="draft-create-form" @submit.prevent="submitDraftCreate">
             <label class="draft-create-field">
               <span>초안 제목</span>
-              <input v-model="createForm.title" maxlength="255" placeholder="예: 고요가 머무는 자리" />
+              <input
+                v-model="createForm.title"
+                data-testid="draft-create-title-input"
+                maxlength="255"
+                placeholder="예: 고요가 머무는 자리"
+              />
             </label>
 
             <label class="draft-create-field">
@@ -176,6 +183,7 @@ function formatStatus(status: 'active' | 'archived') {
             <div class="draft-create-actions">
               <button
                 class="button-primary"
+                data-testid="draft-create-submit"
                 type="submit"
                 :disabled="createState === 'submitting' || createForm.title.trim().length === 0"
               >
@@ -234,4 +242,5 @@ function formatStatus(status: 'active' | 'archived') {
       </div>
     </section>
   </main>
+  <NuxtPage v-else />
 </template>

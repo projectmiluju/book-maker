@@ -19,7 +19,13 @@ import {
           </p>
 
           <div class="actions">
-            <NuxtLink class="button-primary" to="/app/write">기록 시작하기</NuxtLink>
+            <NuxtLink
+              class="button-primary"
+              data-testid="landing-start-writing"
+              to="/app/write"
+            >
+              기록 시작하기
+            </NuxtLink>
             <NuxtLink class="button-ghost" to="/app/drafts">
               초안 흐름 보기
             </NuxtLink>

@@ -10,6 +10,34 @@
 
 ---
 
+## 2026-03-27 (Playwright smoke e2e baseline)
+
+### 완료
+
+- 이슈 `#35` 기준 `apps/web`에 Playwright baseline과 핵심 사용자 흐름 smoke 시나리오를 추가
+- 랜딩 CTA에서 시작해 `write -> archive -> draft -> preview`로 이어지는 최소 E2E를 실제 UI 기준으로 연결
+- smoke 시나리오가 덜 brittle하게 동작하도록 랜딩, write, draft 화면에 최소 테스트 훅을 추가
+- 루트 스크립트와 CI 워크플로에 web smoke e2e 실행 경로를 보강
+
+### 현재 상태
+
+- MVP 핵심 루프는 unit/integration 수준을 넘어 실제 브라우저 흐름으로도 회귀를 확인할 수 있는 baseline이 생겼다
+- PR 품질 게이트에서 backend e2e와 별도로 frontend 핵심 사용자 흐름 smoke를 연결할 수 있는 구조가 마련되었다
+- 남은 후속 작업은 smoke 범위를 넓히기보다 flaky 포인트를 줄이고 필요한 최소 시나리오만 정제하는 쪽에 가깝다
+
+### 다음 액션
+
+1. smoke E2E를 실제 CI에서 안정적으로 반복 실행하면서 flaky 지점을 정리한다
+2. 필요하면 인증 만료 복구나 entry reorder 같은 고위험 흐름을 후속 smoke 시나리오로 분리한다
+3. landing과 preview 주변 polish는 회귀 보호 범위를 유지한 채 필요한 수준만 다듬는다
+
+### 메모
+
+- 검증은 `pnpm --filter @book-maker/web lint`, `typecheck`, `test`, `build`, `test:e2e`를 기준으로 확인
+- web smoke e2e는 PostgreSQL / Redis가 켜진 상태에서 API와 web 서버를 함께 띄우는 구조를 사용한다
+
+---
+
 ## 2026-03-27 (Landing page implementation)
 
 ### 완료
