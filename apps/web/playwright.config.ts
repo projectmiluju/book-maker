@@ -14,11 +14,15 @@ const webServerCommand = process.env.CI
 
 export default defineConfig({
   testDir: './e2e',
+  outputDir: './test-results',
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: 1,
-  reporter: 'list',
+  reporter: [
+    ['list'],
+    ['html', { open: 'never', outputFolder: './playwright-report' }],
+  ],
   use: {
     baseURL: webBaseUrl,
     trace: 'on-first-retry',
