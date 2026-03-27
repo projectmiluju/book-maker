@@ -95,6 +95,12 @@ MVP에서는:
 - integration test
 - build
 
+현재 저장소 기준 추가 반영:
+
+- backend / frontend 품질 게이트가 GitHub Actions `ci.yml`에 연결되어 있음
+- Playwright smoke E2E가 CI 경로에 포함되어 있음
+- smoke 실패 분석을 위해 `playwright-report`, `test-results` artifact 업로드 경로가 준비되어 있음
+
 ### CD
 
 검증된 코드를 자동으로 배포하는 단계
@@ -184,6 +190,12 @@ PR 통과 기준:
 역할:
 
 - 핵심 사용자 흐름 smoke test
+
+현재 상태:
+
+- 별도 workflow 분리 전, `ci.yml` 내부에서 web smoke E2E를 운영
+- PostgreSQL / Redis는 service container 기반으로 기동
+- Playwright browser cache와 artifact 수집 경로를 함께 관리
 
 ## 9. 테스트 환경 전략
 
@@ -407,6 +419,10 @@ PR / 배포 이전 품질 게이트:
 
 - smoke E2E 추가
 - coverage / quality gate 보강
+
+### 현재 기준
+
+Step 1 through Step 5의 MVP 범위 기반 작업은 완료된 상태로 본다. 이후 DevOps / CI 작업은 MVP closeout 유지, Phase 2 기능 회귀 방지, 실제 배포 경로 정리 같은 후속 운영 단계로 이어진다.
 
 ## 21. 하지 말아야 할 것
 

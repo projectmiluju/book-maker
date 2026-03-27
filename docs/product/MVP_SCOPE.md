@@ -159,6 +159,20 @@ The MVP is ready for internal testing when a user can:
 
 If any of these actions fail or feel confusing, the MVP is not ready.
 
+## 9.1 Current Closeout Status
+
+Current repository status:
+
+- signup/login and protected writing access are implemented
+- entries can be created, autosaved, edited, and revisited in archive
+- drafts can be created, populated, reordered, and cleaned up
+- draft preview and landing page are connected in the real app
+- core-loop and auth-expiry smoke E2E are part of the current quality gate
+
+This means the MVP scope is functionally satisfied.
+
+Remaining items at this stage should be treated as non-blocking polish unless they reveal a real usability or reliability gap in the existing MVP loop.
+
 ## 10. Next Documents
 
 The next PM document should be:
