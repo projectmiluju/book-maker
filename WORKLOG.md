@@ -10,6 +10,35 @@
 
 ---
 
+## 2026-04-04 (Phase 2 archive basic search baseline)
+
+### 완료
+
+- 이슈 `#45` 기준 아카이브 기본 검색 흐름을 추가해 제목/본문 기준 사용자 범위 검색을 시작
+- `GET /entries`에 기본 검색 파라미터를 연결하고 PostgreSQL `ILIKE` 기반 필터를 사용자 소유 범위 안에서 적용
+- 아카이브 화면에 검색 입력, 검색 결과 상태, 전체 보기 복귀 흐름을 추가
+- entries API e2e, entries service 테스트, archive composable 테스트를 보강
+- `README.md`, `docs/product/ROADMAP.md`에 Phase 2 시작 상태를 현재 구현 기준으로 반영
+
+### 현재 상태
+
+- MVP 핵심 루프는 유지한 채 Phase 2의 첫 archive intelligence 기능이 실제 코드에 들어왔다
+- 사용자는 날짜순 아카이브를 그대로 유지하면서 필요한 제목이나 문장을 다시 찾을 수 있다
+- 검색은 별도 검색 엔진 없이 현재 PostgreSQL 쿼리 계층에서 시작하는 baseline 상태다
+
+### 다음 액션
+
+1. 검색 사용성을 보며 tag, filter, reflection view 같은 후속 archive intelligence 작업을 별도 이슈로 나눈다
+2. 검색이 실제 사용 흐름에서 충분하면 route query 유지나 search UX polish 필요 여부를 작은 범위로 판단한다
+3. Phase 2 기능이 늘어날수록 기존 core-loop smoke와 API 권한 테스트로 회귀를 계속 막는다
+
+### 메모
+
+- 이번 작업은 로드맵 후반 기능으로 확장하지 않고 `simple search`만 최소 범위로 도입했다
+- body/title substring 검색은 현재 문서에 맞춰 PostgreSQL `ILIKE`로 시작하고, 더 깊은 검색은 후속 단계에서 판단한다
+
+---
+
 ## 2026-03-27 (MVP closeout and Phase 2 entry)
 
 ### 완료
