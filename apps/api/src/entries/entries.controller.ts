@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 
@@ -23,27 +24,21 @@ export class EntriesController {
   constructor(private readonly entriesService: EntriesService) {}
 
   @Post()
-  async createEntry(
-    @CurrentUser() user: AuthenticatedUser,
-    @Body() dto: CreateEntryDto,
-  ) {
+  async createEntry(@CurrentUser() user: AuthenticatedUser, @Body() dto: CreateEntryDto) {
     const entry = await this.entriesService.createEntry(user.userId, dto);
 
     return toPublicEntry(entry);
   }
 
   @Get()
-  async listEntries(@CurrentUser() user: AuthenticatedUser) {
-    const entries = await this.entriesService.listEntries(user.userId);
+  async listEntries(@CurrentUser() user: AuthenticatedUser, @Query('query') query?: string) {
+    const entries = await this.entriesService.listEntries(user.userId, query);
 
     return entries.map(toPublicEntry);
   }
 
   @Get(':entryId')
-  async getEntry(
-    @CurrentUser() user: AuthenticatedUser,
-    @Param('entryId') entryId: string,
-  ) {
+  async getEntry(@CurrentUser() user: AuthenticatedUser, @Param('entryId') entryId: string) {
     const entry = await this.entriesService.findEntryById(user.userId, entryId);
 
     return toPublicEntry(entry);
@@ -61,10 +56,7 @@ export class EntriesController {
   }
 
   @Delete(':entryId')
-  async deleteEntry(
-    @CurrentUser() user: AuthenticatedUser,
-    @Param('entryId') entryId: string,
-  ) {
+  async deleteEntry(@CurrentUser() user: AuthenticatedUser, @Param('entryId') entryId: string) {
     await this.entriesService.deleteEntry(user.userId, entryId);
 
     return {

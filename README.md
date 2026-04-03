@@ -10,7 +10,7 @@
 - MVP 핵심 루프 `write -> archive -> draft -> preview` 구현 완료
 - 랜딩 페이지와 실제 앱 진입 CTA 연결 완료
 - Playwright smoke E2E와 auth-expiry smoke, CI artifact 수집 경로까지 반영
-- 다음 기본 작업 범위는 `Phase 2. Writing Depth And Archive Intelligence`
+- 아카이브 기본 검색 흐름으로 `Phase 2. Writing Depth And Archive Intelligence` 작업 시작
 
 ## 현재 방향
 
@@ -88,8 +88,8 @@
 MVP는 기능 기준으로 닫힌 상태다. 다음 작업은 아래 순서를 기본으로 잡는다.
 
 1. MVP closeout 기준과 문서를 유지
-2. non-blocking polish는 작은 범위로만 정리
-3. `Phase 2. Writing Depth And Archive Intelligence` 범위 이슈를 순차적으로 진행
+2. `Phase 2. Writing Depth And Archive Intelligence` 범위를 작은 단위로 순차 구현
+3. non-blocking polish는 회귀나 명확한 사용성 공백이 있을 때만 다룬다
 
 세부 기준은 [IMPLEMENTATION_PHASES.md](docs/engineering/IMPLEMENTATION_PHASES.md), [MVP_SCOPE.md](docs/product/MVP_SCOPE.md), [ROADMAP.md](docs/product/ROADMAP.md)를 따른다.
 

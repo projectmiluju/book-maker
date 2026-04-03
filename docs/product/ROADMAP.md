@@ -254,8 +254,9 @@ It evolves in layers:
 
 Current confirmed focus:
 
-- Phase 1 only
+- Phase 1 complete
+- Phase 2 started with archive basic search baseline
 
 Documented for future planning:
 
-- Phase 2 through Phase 7
+- remaining Phase 2 through Phase 7

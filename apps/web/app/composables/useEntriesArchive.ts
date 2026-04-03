@@ -6,7 +6,7 @@ export type ArchiveListState = 'idle' | 'loading' | 'loaded' | 'empty' | 'error'
 export type EntryDetailState = 'idle' | 'loading' | 'loaded' | 'error';
 
 type EntriesReaderApi = {
-  listEntries(): Promise<PublicEntry[]>;
+  listEntries(searchQuery?: string): Promise<PublicEntry[]>;
   getEntry(entryId: string): Promise<PublicEntry>;
 };
 
@@ -18,16 +18,20 @@ export function useEntriesArchive(options: UseEntriesArchiveOptions) {
   const entries = ref<PublicEntry[]>([]);
   const listState = ref<ArchiveListState>('idle');
   const listError = ref('');
+  const activeQuery = ref('');
   const currentEntry = ref<PublicEntry | null>(null);
   const detailState = ref<EntryDetailState>('idle');
   const detailError = ref('');
 
-  async function loadEntries() {
+  async function loadEntries(searchQuery = '') {
+    const normalizedQuery = searchQuery.trim();
+
     listState.value = 'loading';
     listError.value = '';
+    activeQuery.value = normalizedQuery;
 
     try {
-      const nextEntries = await options.api.listEntries();
+      const nextEntries = await options.api.listEntries(normalizedQuery || undefined);
       entries.value = nextEntries;
       listState.value = nextEntries.length > 0 ? 'loaded' : 'empty';
     } catch {
@@ -64,17 +68,14 @@ export function useEntriesArchive(options: UseEntriesArchiveOptions) {
       return;
     }
 
-    entries.value = [
-      ...entries.value.slice(0, index),
-      entry,
-      ...entries.value.slice(index + 1),
-    ];
+    entries.value = [...entries.value.slice(0, index), entry, ...entries.value.slice(index + 1)];
   }
 
   return {
     entries,
     listState,
     listError,
+    activeQuery,
     currentEntry,
     detailState,
     detailError,
