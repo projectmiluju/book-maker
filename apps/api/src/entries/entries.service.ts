@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { DatabaseService } from '../infrastructure/database/database.service';
 import { EntryRecord, EntryStatus } from './entry.types';
@@ -49,18 +45,15 @@ export class EntriesService {
           updated_at AS "updatedAt",
           last_saved_at AS "lastSavedAt"
       `,
-      [
-        userId,
-        normalizeTitle(input.title),
-        input.body ?? '',
-        input.status ?? 'draft',
-      ],
+      [userId, normalizeTitle(input.title), input.body ?? '', input.status ?? 'draft'],
     );
 
     return result.rows[0];
   }
 
-  async listEntries(userId: string): Promise<EntryRecord[]> {
+  async listEntries(userId: string, query?: string): Promise<EntryRecord[]> {
+    const normalizedQuery = normalizeSearchQuery(query);
+    const searchPattern = normalizedQuery ? `%${escapeLike(normalizedQuery)}%` : null;
     const result = await this.databaseService.getPool().query<EntryRow>(
       `
         SELECT
@@ -74,9 +67,14 @@ export class EntriesService {
           last_saved_at AS "lastSavedAt"
         FROM entries
         WHERE user_id = $1
+          AND (
+            $2::text IS NULL
+            OR COALESCE(title, '') ILIKE $2 ESCAPE '\\'
+            OR body ILIKE $2 ESCAPE '\\'
+          )
         ORDER BY updated_at DESC, created_at DESC
       `,
-      [userId],
+      [userId, searchPattern],
     );
 
     return result.rows;
@@ -115,11 +113,7 @@ export class EntriesService {
     entryId: string,
     input: UpdateEntryInput,
   ): Promise<EntryRecord> {
-    if (
-      input.title === undefined &&
-      input.body === undefined &&
-      input.status === undefined
-    ) {
+    if (input.title === undefined && input.body === undefined && input.status === undefined) {
       throw new BadRequestException('수정할 기록 필드가 필요합니다.');
     }
 
@@ -187,4 +181,18 @@ function normalizeTitle(title: string | undefined): string | null {
   const normalized = title.trim();
 
   return normalized.length > 0 ? normalized : null;
+}
+
+function normalizeSearchQuery(query: string | undefined): string | null {
+  if (query === undefined) {
+    return null;
+  }
+
+  const normalized = query.trim();
+
+  return normalized.length > 0 ? normalized : null;
+}
+
+function escapeLike(value: string): string {
+  return value.replace(/[\\%_]/g, '\\$&');
 }

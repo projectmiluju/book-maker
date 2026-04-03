@@ -1,9 +1,4 @@
-import {
-  describe,
-  expect,
-  it,
-  vi,
-} from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import type { PublicEntry } from '../types/entries';
 import { useEntriesArchive } from './useEntriesArchive';
@@ -23,12 +18,15 @@ function createEntryFixture(overrides: Partial<PublicEntry> = {}): PublicEntry {
 
 describe('useEntriesArchive', () => {
   it('loads archive entries and marks the list as loaded', async () => {
+    const listEntries = vi
+      .fn()
+      .mockResolvedValue([
+        createEntryFixture(),
+        createEntryFixture({ id: 'entry-2', title: '두 번째 기록' }),
+      ]);
     const archive = useEntriesArchive({
       api: {
-        listEntries: vi.fn().mockResolvedValue([
-          createEntryFixture(),
-          createEntryFixture({ id: 'entry-2', title: '두 번째 기록' }),
-        ]),
+        listEntries,
         getEntry: vi.fn(),
       },
     });
@@ -37,6 +35,7 @@ describe('useEntriesArchive', () => {
 
     expect(archive.listState.value).toBe('loaded');
     expect(archive.entries.value).toHaveLength(2);
+    expect(listEntries).toHaveBeenCalledWith(undefined);
   });
 
   it('marks the archive as empty when there are no entries', async () => {
@@ -74,5 +73,23 @@ describe('useEntriesArchive', () => {
 
     expect(archive.detailState.value).toBe('error');
     expect(archive.detailError.value).toContain('불러오지 못했습니다');
+  });
+
+  it('normalizes the active query and requests filtered entries', async () => {
+    const listEntries = vi
+      .fn()
+      .mockResolvedValue([createEntryFixture({ id: 'entry-9', title: '파도 냄새' })]);
+    const archive = useEntriesArchive({
+      api: {
+        listEntries,
+        getEntry: vi.fn(),
+      },
+    });
+
+    await archive.loadEntries('  파도  ');
+
+    expect(archive.activeQuery.value).toBe('파도');
+    expect(listEntries).toHaveBeenCalledWith('파도');
+    expect(archive.entries.value).toHaveLength(1);
   });
 });

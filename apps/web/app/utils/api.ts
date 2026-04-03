@@ -18,13 +18,7 @@ type SignupInput = AuthCredentials & {
 
 type Fetcher = (input: string, init?: RequestInit) => Promise<Response>;
 
-type JsonBody =
-  | Record<string, unknown>
-  | string
-  | number
-  | boolean
-  | null
-  | undefined;
+type JsonBody = Record<string, unknown> | string | number | boolean | null | undefined;
 
 export class ApiError extends Error {
   constructor(
@@ -66,10 +60,15 @@ export function createEntriesApiClient(
   fetcher: Fetcher = globalThis.fetch,
 ) {
   return {
-    listEntries() {
-      return requestJson<PublicEntry[]>(fetcher, baseUrl, '/entries', {
-        headers: createAuthHeaders(getAccessToken),
-      });
+    listEntries(searchQuery?: string) {
+      return requestJson<PublicEntry[]>(
+        fetcher,
+        baseUrl,
+        withQuery('/entries', searchQuery ? { query: searchQuery } : undefined),
+        {
+          headers: createAuthHeaders(getAccessToken),
+        },
+      );
     },
     createEntry(input: EntryInput) {
       return requestJson<PublicEntry>(fetcher, baseUrl, '/entries', {
@@ -122,16 +121,11 @@ export function createDraftsApiClient(
       });
     },
     addEntriesToDraft(draftId: string, entryIds: string[]) {
-      return requestJson<PublicDraftDetail>(
-        fetcher,
-        baseUrl,
-        `/drafts/${draftId}/entries`,
-        {
-          method: 'POST',
-          body: { entryIds },
-          headers: createAuthHeaders(getAccessToken),
-        },
-      );
+      return requestJson<PublicDraftDetail>(fetcher, baseUrl, `/drafts/${draftId}/entries`, {
+        method: 'POST',
+        body: { entryIds },
+        headers: createAuthHeaders(getAccessToken),
+      });
     },
     removeDraftEntry(draftId: string, entryId: string) {
       return requestJson<PublicDraftDetail>(
@@ -197,6 +191,24 @@ async function requestJson<T>(
 
 function buildApiUrl(baseUrl: string, path: string): string {
   return `${baseUrl.replace(/\/+$/, '')}/${path.replace(/^\/+/, '')}`;
+}
+
+function withQuery(path: string, params?: Record<string, string | undefined>): string {
+  if (!params) {
+    return path;
+  }
+
+  const searchParams = new URLSearchParams();
+
+  for (const [key, value] of Object.entries(params)) {
+    if (value) {
+      searchParams.set(key, value);
+    }
+  }
+
+  const query = searchParams.toString();
+
+  return query.length > 0 ? `${path}?${query}` : path;
 }
 
 async function readPayload(response: Response): Promise<unknown> {

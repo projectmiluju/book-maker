@@ -46,4 +46,17 @@ describe('EntriesService', () => {
       NotFoundException,
     );
   });
+
+  it('filters entries by a normalized search query inside the current user scope', async () => {
+    query.mockResolvedValue({
+      rows: [],
+    });
+
+    await entriesService.listEntries('user-1', '  파도_기억%  ');
+
+    expect(query).toHaveBeenCalledWith(expect.stringContaining("COALESCE(title, '') ILIKE $2"), [
+      'user-1',
+      '%파도\\_기억\\%%',
+    ]);
+  });
 });

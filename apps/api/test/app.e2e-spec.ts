@@ -1,12 +1,6 @@
 import { randomUUID } from 'node:crypto';
 
-import {
-  Controller,
-  Get,
-  INestApplication,
-  Module,
-  Query,
-} from '@nestjs/common';
+import { Controller, Get, INestApplication, Module, Query } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 import request from 'supertest';
@@ -187,7 +181,9 @@ class FakePool {
     }
 
     if (
-      normalizedQuery.includes('FROM entries WHERE user_id = $1 ORDER BY updated_at DESC')
+      normalizedQuery.includes('FROM entries') &&
+      normalizedQuery.includes('WHERE user_id = $1') &&
+      normalizedQuery.includes('ORDER BY updated_at DESC, created_at DESC')
     ) {
       return this.listEntries<T>(values);
     }
@@ -213,9 +209,7 @@ class FakePool {
       return this.listDraftEntries<T>(values);
     }
 
-    if (
-      normalizedQuery.includes('FROM entries WHERE user_id = $1 AND id = ANY($2::uuid[])')
-    ) {
+    if (normalizedQuery.includes('FROM entries WHERE user_id = $1 AND id = ANY($2::uuid[])')) {
       return this.selectEntriesByIds<T>(values);
     }
 
@@ -247,17 +241,11 @@ class FakePool {
       return this.updateEntry<T>(values);
     }
 
-    if (
-      normalizedQuery.startsWith('UPDATE drafts') &&
-      normalizedQuery.includes('RETURNING')
-    ) {
+    if (normalizedQuery.startsWith('UPDATE drafts') && normalizedQuery.includes('RETURNING')) {
       return this.updateDraft<T>(values);
     }
 
-    if (
-      normalizedQuery.startsWith('UPDATE drafts') &&
-      !normalizedQuery.includes('RETURNING')
-    ) {
+    if (normalizedQuery.startsWith('UPDATE drafts') && !normalizedQuery.includes('RETURNING')) {
       return this.touchDraft(values);
     }
 
@@ -367,8 +355,22 @@ class FakePool {
 
   private listEntries<T>(values: unknown[]) {
     const userId = values[0] as string;
+    const searchPattern = (values[1] as string | null | undefined) ?? null;
+    const normalizedSearch = normalizeSearchPattern(searchPattern);
     const entries = [...this.entriesById.values()]
-      .filter((entry) => entry.userId === userId)
+      .filter((entry) => {
+        if (entry.userId !== userId) {
+          return false;
+        }
+
+        if (!normalizedSearch) {
+          return true;
+        }
+
+        return (
+          entry.title?.includes(normalizedSearch) === true || entry.body.includes(normalizedSearch)
+        );
+      })
       .sort((left, right) => right.updatedAt.getTime() - left.updatedAt.getTime())
       .map((entry) => this.toEntryRow(entry)) as T[];
 
@@ -692,6 +694,14 @@ class FakePool {
   }
 }
 
+function normalizeSearchPattern(value: string | null): string | null {
+  if (!value) {
+    return null;
+  }
+
+  return value.replace(/^%|%$/g, '').replace(/\\([\\%_])/g, '$1');
+}
+
 class FakeDatabaseService {
   private readonly pool = new FakePool();
 
@@ -790,14 +800,17 @@ describe('AppController (e2e)', () => {
   it('/api/health (GET)', () => {
     const server = app.getHttpServer();
 
-    return request(server).get('/api/health').expect(200).expect({
-      status: 'ok',
-      service: 'book-maker-api',
-      dependencies: {
-        postgres: 'disabled',
-        redis: 'disabled',
-      },
-    });
+    return request(server)
+      .get('/api/health')
+      .expect(200)
+      .expect({
+        status: 'ok',
+        service: 'book-maker-api',
+        dependencies: {
+          postgres: 'disabled',
+          redis: 'disabled',
+        },
+      });
   });
 
   it('rejects unknown query fields with the global ValidationPipe', () => {
@@ -1002,6 +1015,58 @@ describe('AppController (e2e)', () => {
       .delete(`/api/entries/${createdEntry.id}`)
       .set('Authorization', `Bearer ${stranger.accessToken}`)
       .expect(404);
+  });
+
+  it('filters the archive list by title or body within the current user scope', async () => {
+    const server = app.getHttpServer();
+    const owner = await signup(server, 'search-owner@example.com');
+    const stranger = await signup(server, 'search-other@example.com');
+
+    await createEntry(server, owner.accessToken, {
+      title: '파도 냄새',
+      body: '창문 틈으로 바다 냄새가 스며들었다.',
+    });
+    const matchingEntry = await createEntry(server, owner.accessToken, {
+      title: '저녁 산책',
+      body: '해변에서 주운 문장을 다시 적어 두었다.',
+    });
+    await createEntry(server, owner.accessToken, {
+      title: '산책 메모',
+      body: '도심 골목의 불빛만 남았다.',
+    });
+    await createEntry(server, stranger.accessToken, {
+      title: '해변에서',
+      body: '다른 사용자의 기록은 검색 결과에 보이면 안 된다.',
+    });
+
+    const titleSearchResponse = await request(server)
+      .get('/api/entries')
+      .query({ query: '파도' })
+      .set('Authorization', `Bearer ${owner.accessToken}`)
+      .expect(200);
+    const titleSearchBody = titleSearchResponse.body as EntryResponseBody[];
+
+    expect(titleSearchBody).toHaveLength(1);
+    expect(titleSearchBody[0]?.title).toBe('파도 냄새');
+
+    const bodySearchResponse = await request(server)
+      .get('/api/entries')
+      .query({ query: '주운 문장' })
+      .set('Authorization', `Bearer ${owner.accessToken}`)
+      .expect(200);
+    const bodySearchBody = bodySearchResponse.body as EntryResponseBody[];
+
+    expect(bodySearchBody).toHaveLength(1);
+    expect(bodySearchBody[0]?.id).toBe(matchingEntry.id);
+
+    await request(server)
+      .get('/api/entries')
+      .query({ query: '   ' })
+      .set('Authorization', `Bearer ${owner.accessToken}`)
+      .expect(200)
+      .expect((response) => {
+        expect(response.body).toHaveLength(3);
+      });
   });
 
   it('creates, lists, reads, updates, and adds entries to a draft inside the current user scope', async () => {
